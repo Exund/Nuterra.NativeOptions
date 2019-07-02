@@ -24,112 +24,94 @@ namespace Exund.ModOptionsTab
 		{
 			StringBuilder tree = new StringBuilder(tab + go.name);
 			tree.AppendLine();
-			tree.AppendFormat("{0}\tComponents :\n", tab);
+			tree.AppendFormat("{0}\tActive: {1}", tab, go.activeSelf);
+			tree.AppendFormat("\n{0}\tComponents :\n", tab);
 			foreach (Component item in go.GetComponents<Component>())
 			{
 				tree.AppendFormat("{0}\t\t{1} {2}", tab, item.GetType().ToString(), item.name);
-				if (item is RectTransform rect)
+				try
 				{
-					tree.AppendFormat("\n{0}\t\t\tanchoredPosition3D {1}", tab, rect.anchoredPosition3D.ToString());
-					tree.AppendFormat("\n{0}\t\t\tanchorMin {1}", tab, rect.anchorMin.ToString());
-					tree.AppendFormat("\n{0}\t\t\tanchorMax {1}", tab, rect.anchorMax.ToString());
-					tree.AppendFormat("\n{0}\t\t\toffsetMin {1}", tab, rect.offsetMin.ToString());
-					tree.AppendFormat("\n{0}\t\t\toffsetMax {1}", tab, rect.offsetMax.ToString());
-					tree.AppendFormat("\n{0}\t\t\tpivot {1}", tab, rect.pivot.ToString());
-					tree.AppendFormat("\n{0}\t\t\tsizeDelta {1}", tab, rect.sizeDelta.ToString());
-					tree.AppendFormat("\n{0}\t\t\tlocalScale {1}", tab, rect.localScale.ToString());
-				}
-				if (item is HorizontalOrVerticalLayoutGroup lg)
-				{
-					tree.AppendFormat("\n{0}\t\t\tchildAlignment {1}", tab, lg.childAlignment.ToString());
-					tree.AppendFormat("\n{0}\t\t\tchildControlWidth {1}", tab, lg.childControlWidth);
-					tree.AppendFormat("\n{0}\t\t\tchildControlHeight {1}", tab, lg.childControlHeight);
-					tree.AppendFormat("\n{0}\t\t\tchildForceExpandWidth {1}", tab, lg.childForceExpandWidth);
-					tree.AppendFormat("\n{0}\t\t\tchildForceExpandHeight {1}", tab, lg.childForceExpandHeight);
-					tree.AppendFormat("\n{0}\t\t\tlayoutPriority {1}", tab, lg.layoutPriority);
-					tree.AppendFormat("\n{0}\t\t\tspacing {1}", tab, lg.spacing);
-					tree.AppendFormat("\n{0}\t\t\tpadding {1}", tab, lg.padding);
-					tree.AppendFormat("\n{0}\t\t\tminWidth {1}", tab, lg.minWidth);
-					tree.AppendFormat("\n{0}\t\t\tminHeight {1}", tab, lg.minHeight);
-					tree.AppendFormat("\n{0}\t\t\tpreferredWidth {1}", tab, lg.preferredWidth);
-					tree.AppendFormat("\n{0}\t\t\tpreferredHeight {1}", tab, lg.preferredHeight);
-					tree.AppendFormat("\n{0}\t\t\tflexibleWidth {1}", tab, lg.flexibleWidth);
-					tree.AppendFormat("\n{0}\t\t\tflexibleHeight {1}", tab, lg.flexibleHeight);
-				}
-				if (item is Text t)
-				{
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "text", t.text);
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "alignment", t.alignment.ToString());
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "font", t.font.name);
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "fontSize", t.fontSize);
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "fontStyle", t.fontStyle.ToString());
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "color", t.color.ToString());
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "lineSpacing", t.lineSpacing);
-				}
-				if (item is Shadow s)
-				{
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "effectColor", s.effectColor.ToString());
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "effectColor", s.effectDistance.ToString());
-				}
-				if (item is Image i)
-				{
-					if(i.sprite) tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "sprite", i.sprite.name);
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "color", i.color);
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "type", i.type.ToString());
-				}
-				if (item is Selectable se)
-				{
-					if (se.image)
+					if (item is RectTransform rect)
 					{
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "image", se.image.name);
-						if (se.image.sprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "sprite", se.image.sprite.name);
-						tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "color", se.image.color);
-						tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "type", se.image.type.ToString());
+						tree.AppendFormat("\n{0}\t\t\tanchoredPosition3D {1}", tab, rect.anchoredPosition3D.ToString());
+						tree.AppendFormat("\n{0}\t\t\tanchorMin ({1}, {2})", tab, rect.anchorMin.x, rect.anchorMin.y);
+						tree.AppendFormat("\n{0}\t\t\tanchorMax ({1}, {2})", tab, rect.anchorMax.x, rect.anchorMax.y);
+						tree.AppendFormat("\n{0}\t\t\toffsetMin {1}", tab, rect.offsetMin.ToString());
+						tree.AppendFormat("\n{0}\t\t\toffsetMax {1}", tab, rect.offsetMax.ToString());
+						tree.AppendFormat("\n{0}\t\t\tpivot {1}", tab, rect.pivot.ToString());
+						tree.AppendFormat("\n{0}\t\t\tsizeDelta {1}", tab, rect.sizeDelta.ToString());
+						tree.AppendFormat("\n{0}\t\t\tlocalScale {1}", tab, rect.localScale.ToString());
 					}
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "transition", se.transition.ToString());
-					switch(se.transition)
+					if (item is HorizontalOrVerticalLayoutGroup lg)
 					{
-						case Selectable.Transition.ColorTint:
-							var colors = se.colors;
-							tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "normalColor", colors.normalColor.ToString());
-							tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "highlightedColor", colors.highlightedColor.ToString());
-							tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "pressedColor", colors.pressedColor.ToString());
-							tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "disabledColor", colors.disabledColor.ToString());
-							tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "colorMultiplier", colors.colorMultiplier.ToString());
-							tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "fadeDuration", colors.fadeDuration.ToString());
-							break;
-						case Selectable.Transition.SpriteSwap:
-							var state = se.spriteState;
-							if(state.highlightedSprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "highlightedSprite", state.highlightedSprite.name);
-							if(state.pressedSprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "pressedSprite", state.pressedSprite.name);
-							if(state.disabledSprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "disabledSprite", state.disabledSprite.name);
-							break;
-						default: break;
+						tree.AppendFormat("\n{0}\t\t\tchildAlignment {1}", tab, lg.childAlignment.ToString());
+						tree.AppendFormat("\n{0}\t\t\tchildControlWidth {1}", tab, lg.childControlWidth);
+						tree.AppendFormat("\n{0}\t\t\tchildControlHeight {1}", tab, lg.childControlHeight);
+						tree.AppendFormat("\n{0}\t\t\tchildForceExpandWidth {1}", tab, lg.childForceExpandWidth);
+						tree.AppendFormat("\n{0}\t\t\tchildForceExpandHeight {1}", tab, lg.childForceExpandHeight);
+						tree.AppendFormat("\n{0}\t\t\tlayoutPriority {1}", tab, lg.layoutPriority);
+						tree.AppendFormat("\n{0}\t\t\tspacing {1}", tab, lg.spacing);
+						tree.AppendFormat("\n{0}\t\t\tpadding {1}", tab, lg.padding);
+						tree.AppendFormat("\n{0}\t\t\tminWidth {1}", tab, lg.minWidth);
+						tree.AppendFormat("\n{0}\t\t\tminHeight {1}", tab, lg.minHeight);
+						tree.AppendFormat("\n{0}\t\t\tpreferredWidth {1}", tab, lg.preferredWidth);
+						tree.AppendFormat("\n{0}\t\t\tpreferredHeight {1}", tab, lg.preferredHeight);
+						tree.AppendFormat("\n{0}\t\t\tflexibleWidth {1}", tab, lg.flexibleWidth);
+						tree.AppendFormat("\n{0}\t\t\tflexibleHeight {1}", tab, lg.flexibleHeight);
 					}
-				}
-				if (item is Button b)
-				{
-					/*if (b.image)
+					if (item is Text t)
 					{
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "image", b.image.name);
-						if (b.image.sprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "sprite", b.image.sprite.name);
-						tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "color", b.image.color);
-						tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "type", b.image.type.ToString());
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "text", t.text);
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "alignment", t.alignment.ToString());
+						if(t.font) tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "font", t.font.name);
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "fontSize", t.fontSize);
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "fontStyle", t.fontStyle.ToString());
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "color", t.color.ToString());
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "lineSpacing", t.lineSpacing);
 					}
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "transition", b.transition.ToString());*/
-				}
-				if (item is Toggle to)
-				{
-					/*if (to.image)
+					if (item is Shadow s)
 					{
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "image", to.image.name);
-						if (to.image.sprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "sprite", to.image.sprite.name);
-						tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "color", to.image.color);
-						tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "type", to.image.type.ToString());
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "effectColor", s.effectColor.ToString());
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "effectColor", s.effectDistance.ToString());
 					}
-					tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "transition", to.transition.ToString());*/
-				}
-				tree.AppendLine();
+					if (item is Image i)
+					{
+						if (i.sprite) tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "sprite", i.sprite.name);
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "color", i.color);
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "type", i.type.ToString());
+					}
+					if (item is Selectable se)
+					{
+						if (se.image)
+						{
+							tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "image", se.image.name);
+							if (se.image.sprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "sprite", se.image.sprite.name);
+							tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "color", se.image.color);
+							tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "type", se.image.type.ToString());
+						}
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "transition", se.transition.ToString());
+						switch (se.transition)
+						{
+							case Selectable.Transition.ColorTint:
+								var colors = se.colors;
+								tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "normalColor", colors.normalColor.ToString());
+								tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "highlightedColor", colors.highlightedColor.ToString());
+								tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "pressedColor", colors.pressedColor.ToString());
+								tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "disabledColor", colors.disabledColor.ToString());
+								tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "colorMultiplier", colors.colorMultiplier.ToString());
+								tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "fadeDuration", colors.fadeDuration.ToString());
+								break;
+							case Selectable.Transition.SpriteSwap:
+								var state = se.spriteState;
+								if (state.highlightedSprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "highlightedSprite", state.highlightedSprite.name);
+								if (state.pressedSprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "pressedSprite", state.pressedSprite.name);
+								if (state.disabledSprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "disabledSprite", state.disabledSprite.name);
+								break;
+							default: break;
+						}
+					}
+					tree.AppendLine();
+				} catch { }
 			}
 			tree.AppendLine();
 			tree.AppendFormat("{0}\tChildrens :\n", tab);
@@ -146,87 +128,146 @@ namespace Exund.ModOptionsTab
 
 	static class Patches
 	{
+		static FieldInfo m_OptionsTypeCount;
+		static FieldInfo m_OptionsTabs;
+		static FieldInfo m_OptionsElements;
+		static FieldInfo BehaviourToggle_m_Target;
+		static FieldInfo BehaviourSlider_m_Target;
+		static FieldInfo BehaviourSlider_m_FSM;
+		static MethodInfo BehaviourSlider_OnPool;
+		static FieldInfo BehaviourSeed_m_Target;
+		static FieldInfo BehaviourInputField_m_Target;
+
+		static Patches()
+		{
+			Type UIScreenOptionsType = typeof(UIScreenOptions);
+			BindingFlags privateFlags = BindingFlags.Instance | BindingFlags.NonPublic;
+			m_OptionsTypeCount = UIScreenOptionsType.GetField("m_OptionsTypeCount", privateFlags);
+			m_OptionsTabs = UIScreenOptionsType.GetField("m_OptionsTabs", privateFlags);
+			m_OptionsElements = UIScreenOptionsType.GetField("m_OptionsElements", privateFlags);	
+			BehaviourToggle_m_Target = typeof(UIOptionsBehaviourToggle).GetField("m_Target", privateFlags);
+			Type BehaviourSliderType = typeof(UIOptionsBehaviourSlider);
+			BehaviourSlider_m_Target = BehaviourSliderType.GetField("m_Target", privateFlags);
+			BehaviourSlider_m_FSM = BehaviourSliderType.GetField("m_FSM", privateFlags);
+			BehaviourSlider_OnPool = BehaviourSliderType.GetMethod("OnPool", privateFlags);
+			BehaviourSeed_m_Target = typeof(UIOptionsBehaviourSeedGenerator).GetField("m_Target", privateFlags);
+			BehaviourInputField_m_Target = typeof(UIOptionsBehaviourInputField).GetField("m_Target", privateFlags);
+		}
+
+		[HarmonyPatch(typeof(UIOptionsBehaviourSeedGenerator), "OnEnable")]
+		internal static class UIOptionsBehaviourSeedGeneratorOnEnable
+		{
+			private static void Postfix(ref UIOptionsBehaviourSeedGenerator __instance)
+			{
+				var input = (InputField)BehaviourSeed_m_Target.GetValue(__instance);
+				Console.WriteLine(UIUtilities.GetComponentTree(input.gameObject));
+			}
+		}
+
+		[HarmonyPatch(typeof(UIOptionsBehaviourSlider), "OnEnable")]
+		internal static class UIOptionsBehaviourSliderOnEnable
+		{
+			private static void Prefix(ref UIOptionsBehaviourSlider __instance)
+			{
+				if (BehaviourSlider_m_FSM.GetValue(__instance) == null) BehaviourSlider_OnPool.Invoke(__instance, new object[0]);
+			}
+		}
+
 		[HarmonyPatch(typeof(UIScreenOptions), "Awake")]
 		internal static class UIScreenOptionsAwake
 		{
-			static FieldInfo m_OptionsTypeCount;
-			static FieldInfo m_OptionsTabs;
-			static FieldInfo m_OptionsElements;
-
-			static UIScreenOptionsAwake()
-			{
-				Type UIScreenOptionsType = typeof(UIScreenOptions);
-				BindingFlags privateFlags = BindingFlags.Instance | BindingFlags.NonPublic;
-				m_OptionsTypeCount = UIScreenOptionsType.GetField("m_OptionsTypeCount", privateFlags);
-				m_OptionsTabs = UIScreenOptionsType.GetField("m_OptionsTabs", privateFlags);
-				m_OptionsElements = UIScreenOptionsType.GetField("m_OptionsElements", privateFlags);
-			}
-
 			private static void Postfix(ref UIScreenOptions __instance)
 			{
                 // Add a tab to the settings
 				int optionsCount = (int)m_OptionsTypeCount.GetValue(__instance) + 1;
 				m_OptionsTypeCount.SetValue(__instance, optionsCount);
+				var ratio = (float)(optionsCount - 1f) / (float)(optionsCount);
 
-                // Get settings tabs to an array
+				// Get settings tabs to an array
 				Toggle[] optionsTabs = new Toggle[optionsCount];
 				((Toggle[])m_OptionsTabs.GetValue(__instance)).CopyTo(optionsTabs, 0);
 
                 // Copy last tab to new tab
-				Toggle modsToggle = (optionsTabs[optionsCount - 1] = GameObject.Instantiate<Toggle>(optionsTabs[optionsCount - 2]));
+				Toggle modsToggle = GameObject.Instantiate<Toggle>(optionsTabs[optionsCount - 2]);
 				modsToggle.transform.SetParent(optionsTabs[optionsCount - 2].transform.parent, false);
 				modsToggle.gameObject.SetActive(true);
 
-                // Clear and assign name
+				Console.WriteLine(UIUtilities.GetComponentTree(optionsTabs[0].gameObject));
+				Console.WriteLine(UIUtilities.GetComponentTree(modsToggle.gameObject));
+
+				// Clear and assign name
 				GameObject.DestroyImmediate(modsToggle.gameObject.GetComponentInChildren<UILocalisedText>());
 				modsToggle.GetComponentInChildren<Text>().text = "MODS";
 
-                // Move tabs
+				optionsTabs[optionsCount - 1] = modsToggle;
+				// Move tabs
+				/*var ratioVector = new Vector2(ratio, 1f);
+				float width = 1f;*/
+				var x = 0f;
 				foreach (var toggle in optionsTabs)
 				{
+					if (!toggle) continue;
 					RectTransform toggleRect = toggle.GetComponent<RectTransform>();
 					if (toggleRect)
 					{
-						toggleRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, toggleRect.rect.width * 4f / 5f);
-						toggleRect.anchorMin *= 0.8f;
+						/*//Vector2 anchorMin = toggleRect.anchorMin;
+						//anchorMin.x *= 0.8f;
+						toggleRect.anchorMin *= ratioVector;
+						//Vector2 anchorMax = toggleRect.anchorMax;
+						//anchorMax.x *= 0.8f;
+						toggleRect.anchorMax *= ratioVector;
+						toggleRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, toggleRect.rect.width * ratio);
+						width = toggleRect.rect.width * ratio;*/
+						Vector2 anchorMin = toggleRect.anchorMin;
+						anchorMin.x = x;
+						toggleRect.anchorMin = anchorMin;
+						x += 0.2f;
 						Vector2 anchorMax = toggleRect.anchorMax;
-						anchorMax.x *= 0.8f;
+						anchorMax.x = x;
 						toggleRect.anchorMax = anchorMax;
 					}
 				}
 
-                // Position new tab
+                /*// Position new tab
 				RectTransform modToggleRect = modsToggle.GetComponent<RectTransform>();
-				modToggleRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, modToggleRect.rect.width * 4f / 5f);
-				modToggleRect.anchorMin = new Vector2(0.8f, 0f);
-				modToggleRect.anchorMax = new Vector2(1f, 0.5f);
+				var rect0 = optionsTabs[0].GetComponent<RectTransform>();
+				var anchorMin = modToggleRect.anchorMin;// /= ratioVector;
+				anchorMin.x = 0.815f;
+				modToggleRect.anchorMin = anchorMin;
+				var anchorMax = modToggleRect.anchorMax;// /= ratioVector;
+				anchorMax.x = 0.965f;
+				modToggleRect.anchorMax = anchorMax;
+
 				modToggleRect.anchoredPosition = Vector2.zero;
-				modToggleRect.sizeDelta = optionsTabs[0].GetComponent<RectTransform>().sizeDelta;
+
+				//modToggleRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+				//modToggleRect.sizeDelta = optionsTabs[0].GetComponent<RectTransform>().sizeDelta;
+
+				optionsTabs[optionsCount - 1] = modsToggle;*/
+
+				Console.WriteLine(UIUtilities.GetComponentTree(optionsTabs[0].gameObject));
+				Console.WriteLine(UIUtilities.GetComponentTree(modsToggle.gameObject));
 
 
-				
-				
-                // Get the tab panels to an array
+				// Get the tab panels to an array
 				UIOptions[] optionsElements = new UIOptions[optionsCount];
 				((UIOptions[])m_OptionsElements.GetValue(__instance)).CopyTo(optionsElements, 0);
 
 				Transform parent = optionsElements[0].gameObject.transform.parent;
 
-				/*GameObject holder_panel = DefaultControls.CreatePanel(default(DefaultControls.Resources));
-				GameObject.DestroyImmediate(holder_panel.GetComponent<Image>());
-				holder_panel.transform.SetParent(parent, false);
-				optionsElements[optionsCount - 1] = holder_panel.AddComponent<UIOptionsMod>();*/
-
-               
-
-                // Acquire resources
-				var font = Resources.FindObjectsOfTypeAll<Font>().First(f => f.name == "Exo-SemiBold");
+				// Acquire resources
+				var fonts = Resources.FindObjectsOfTypeAll<Font>();
+				var ExoSemiBold = fonts.First(f => f.name == "Exo-SemiBold");
+				var ExoRegular = fonts.First(f => f.name == "Exo-Regular");
 				var sprites = Resources.FindObjectsOfTypeAll<Sprite>();
 				var Option_BG = sprites.First(f => f.name == "Option_BG");
 				var Option_Content_BG = sprites.First(f => f.name == "Option_Content_BG");
 				var Options_Unticked = sprites.First(f => f.name == "Options_Unticked");
 				var Options_Ticked = sprites.First(f => f.name == "Options_Ticked");
 				var Option_Content_Highlight_BG = sprites.First(f => f.name == "Option_Content_Highlight_BG");
+				var Slider_BG = sprites.First(f => f.name == "Slider_BG");
+				var Slider_Fill_BG = sprites.First(f => f.name == "Slider_Fill_BG");
+				var Knob = sprites.First(f => f.name == "Knob");
 
 				// Give new tab a UIOptions panel and position to reference
 				DefaultControls.Resources resources = default(DefaultControls.Resources);
@@ -254,6 +295,7 @@ namespace Exund.ModOptionsTab
 						Console.WriteLine(UIUtilities.GetComponentTree(Mods));
 					}
 				});
+				((UIOptionsMod)optionsElements[optionsCount - 1]).tab_toggle = modsToggle;
 
 				// Create UI elements
 				GameObject top_panel = DefaultControls.CreatePanel(resources);
@@ -286,7 +328,7 @@ namespace Exund.ModOptionsTab
 				var title1 = category1_title.GetComponent<Text>();
 				title1.text = "LEFT SIDE";
 				title1.alignment = TextAnchor.MiddleCenter;
-				title1.font = font;
+				title1.font = ExoSemiBold;
 				title1.fontSize = 16;
 				title1.color = Color.white;
 				var title1Rect = category1_title.GetComponent<RectTransform>();
@@ -308,7 +350,7 @@ namespace Exund.ModOptionsTab
 				var title2 = category2_title.GetComponent<Text>();
 				title2.text = "RIGHT SIDE";
 				title2.alignment = TextAnchor.MiddleCenter;
-				title2.font = font;
+				title2.font = ExoSemiBold;
 				title2.fontSize = 16;
 				title2.color = Color.white;
 				var title2Rect = category2_title.GetComponent<RectTransform>();
@@ -359,7 +401,8 @@ namespace Exund.ModOptionsTab
 				content1Group.padding = new RectOffset(0, 0, 5, 0);
 				content1.transform.SetParent(mid_panel.transform, false);
 
-                // Checkbox element for testing
+				#region Toggle
+				// Checkbox element for testing
 				GameObject CheckboxOption_Test = DefaultControls.CreateButton(resources);
 				CheckboxOption_Test.name = "CheckboxOption_Test";
 				var checkboxTestImage = CheckboxOption_Test.GetComponent<Image>();
@@ -373,14 +416,17 @@ namespace Exund.ModOptionsTab
 					highlightedSprite = Option_Content_Highlight_BG,
 					pressedSprite = Option_Content_Highlight_BG
 				};
+				var CheckboxOption_TestRect = CheckboxOption_Test.GetComponent<RectTransform>();
 				CheckboxOption_Test.AddComponent<UINavigationEntryPoint>();
+				var CheckboxOption_TestBehaviourToggle = CheckboxOption_Test.AddComponent<UIOptionsBehaviourToggle>();
+				
 				CheckboxOption_Test.transform.SetParent(content1.transform, false);
 
 				GameObject CheckboxOption_Test_Label = CheckboxOption_Test.transform.Find("Text").gameObject;
 				var CheckboxOption_Test_LabelText = CheckboxOption_Test_Label.GetComponent<Text>();
 				CheckboxOption_Test_LabelText.text = "Test";
 				CheckboxOption_Test_LabelText.alignment = TextAnchor.MiddleLeft;
-				CheckboxOption_Test_LabelText.font = font;
+				CheckboxOption_Test_LabelText.font = ExoSemiBold;
 				CheckboxOption_Test_LabelText.fontSize = 15;
 				CheckboxOption_Test_LabelText.color = Color.white;
 				var CheckboxOption_Test_LabelRect = CheckboxOption_Test_Label.GetComponent<RectTransform>();
@@ -399,16 +445,16 @@ namespace Exund.ModOptionsTab
 				});
 				var CheckboxOption_Test_Toggle = temp.transform.Find("Background").gameObject;
 				CheckboxOption_Test_Toggle.name = "TickBox";
-				//GameObject.DestroyImmediate(CheckboxOption_Test_Toggle.transform.Find("Label").gameObject);
 				var CheckboxOption_Test_ToggleToggle = CheckboxOption_Test_Toggle.AddComponent<Toggle>();
+				BehaviourToggle_m_Target.SetValue(CheckboxOption_TestBehaviourToggle, CheckboxOption_Test_ToggleToggle);
 				var image = CheckboxOption_Test_Toggle.GetComponent<Image>();
 				image.type = Image.Type.Simple;
 				CheckboxOption_Test_ToggleToggle.image = image;
 				CheckboxOption_Test_ToggleToggle.transition = Selectable.Transition.ColorTint;
 				var CheckboxOption_Test_ToggleRect = CheckboxOption_Test_Toggle.GetComponent<RectTransform>();
 				CheckboxOption_Test_ToggleRect.anchoredPosition3D = Vector3.zero;
-				CheckboxOption_Test_ToggleRect.anchorMin = new Vector2(0.9f, 0.3f);
-				CheckboxOption_Test_ToggleRect.anchorMax = new Vector2(1f, 0.7f);
+				CheckboxOption_Test_ToggleRect.anchorMin = new Vector2(0.9245809f, 0.3063623f);
+				CheckboxOption_Test_ToggleRect.anchorMax = new Vector2(0.9720991f, 0.6936374f);
 				CheckboxOption_Test_ToggleRect.pivot = Vector2.one / 2;
 				CheckboxOption_Test_ToggleRect.sizeDelta = Vector2.zero;
 				CheckboxOption_Test_Toggle.transform.SetParent(CheckboxOption_Test.transform, false);
@@ -422,14 +468,8 @@ namespace Exund.ModOptionsTab
 				CheckboxOption_Test_Toggle_TickedSpriteRect.pivot = Vector2.one / 2;
 				CheckboxOption_Test_Toggle_TickedSpriteRect.sizeDelta = Vector2.zero;
 				CheckboxOption_Test_ToggleToggle.graphic = CheckboxOption_Test_Toggle_TickedSprite.GetComponent<Image>();
-
-				checkboxTestButton.onClick.AddListener(delegate ()
-				{
-					CheckboxOption_Test_ToggleToggle.isOn = !CheckboxOption_Test_ToggleToggle.isOn;
-				});
-
 				GameObject.DestroyImmediate(temp);
-
+				#endregion Toggle
 
 				GameObject content2 = DefaultControls.CreatePanel(resources);
 				content2.name = "Content 2";
@@ -447,6 +487,155 @@ namespace Exund.ModOptionsTab
 				content2Group.padding = new RectOffset(0, 0, 5, 0);
 				content2.transform.SetParent(mid_panel.transform, false);
 
+
+				#region Slider
+				GameObject SliderOption_Test2 = DefaultControls.CreateButton(resources);
+				SliderOption_Test2.name = "SliderOption_Test2";
+				var sliderTest2Image = SliderOption_Test2.GetComponent<Image>();
+				sliderTest2Image.sprite = Option_Content_BG;
+				sliderTest2Image.type = Image.Type.Simple;
+				sliderTest2Image.color = Color.white;
+				var sliderTest2Button = SliderOption_Test2.GetComponent<Button>();
+				sliderTest2Button.transition = Selectable.Transition.SpriteSwap;
+				sliderTest2Button.spriteState = new SpriteState()
+				{
+					highlightedSprite = Option_Content_Highlight_BG,
+					pressedSprite = Option_Content_Highlight_BG
+				};
+				var SliderOption_Test2Rect = SliderOption_Test2.GetComponent<RectTransform>();
+				var SliderOption_Test2BehaviourSlider = SliderOption_Test2.AddComponent<UIOptionsBehaviourSlider>();
+
+				SliderOption_Test2.transform.SetParent(content2.transform, false);
+
+				GameObject SliderOption_Test2_Label = SliderOption_Test2.transform.Find("Text").gameObject;
+				var SliderOption_Test2_LabelText = SliderOption_Test2_Label.GetComponent<Text>();
+				SliderOption_Test2_LabelText.text = "Test2";
+				SliderOption_Test2_LabelText.alignment = TextAnchor.MiddleLeft;
+				SliderOption_Test2_LabelText.font = ExoSemiBold;
+				SliderOption_Test2_LabelText.fontSize = 15;
+				SliderOption_Test2_LabelText.color = Color.white;
+				var SliderOption_Test2_LabelRect = SliderOption_Test2_Label.GetComponent<RectTransform>();
+				SliderOption_Test2_LabelRect.anchoredPosition3D = new Vector3(-59.7f, 0, 0);
+				SliderOption_Test2_LabelRect.anchorMin = Vector2.zero;
+				SliderOption_Test2_LabelRect.anchorMax = Vector2.one;
+				SliderOption_Test2_LabelRect.pivot = Vector2.one / 2;
+				SliderOption_Test2_LabelRect.sizeDelta = new Vector2(-157.9f, 0);
+				var SliderOption_Test2_LabelShadow = SliderOption_Test2_Label.AddComponent<Shadow>();
+				SliderOption_Test2_LabelShadow.effectColor = new Color(0, 0, 0, 0.5f);
+				SliderOption_Test2_LabelShadow.effectDistance = new Vector2(1f, -1f);
+
+				var SliderOption_Test2_Slider = DefaultControls.CreateSlider(new DefaultControls.Resources()
+				{
+					background = Slider_BG,
+					standard = Slider_Fill_BG,
+					knob = Knob
+				});
+				var SliderOption_Test2_SliderSlider = SliderOption_Test2_Slider.GetComponent<Slider>();
+				BehaviourSlider_m_Target.SetValue(SliderOption_Test2BehaviourSlider, SliderOption_Test2_SliderSlider);
+				SliderOption_Test2_SliderSlider.transition = Selectable.Transition.None;
+				var SliderOption_Test2_SliderRect = SliderOption_Test2_Slider.GetComponent<RectTransform>();
+				SliderOption_Test2_SliderRect.anchoredPosition3D = new Vector3(173.9f, 0, 0);
+				SliderOption_Test2_SliderRect.sizeDelta = new Vector2(201.3f, 23f);
+
+				SliderOption_Test2_Slider.transform.Find("Background").GetComponent<RectTransform>().sizeDelta = new Vector2(0, 4.8f);
+				var SliderOption_Test2_Slider_FillArea = SliderOption_Test2_Slider.transform.Find("Fill Area").gameObject;
+				var SliderOption_Test2_Slider_FillAreaRect = SliderOption_Test2_Slider_FillArea.GetComponent<RectTransform>();
+				SliderOption_Test2_Slider_FillAreaRect.anchoredPosition3D = new Vector3(0.8f, 0, 0);
+				SliderOption_Test2_Slider_FillAreaRect.sizeDelta = new Vector2(-1.5f, 4.8f);
+				var SliderOption_Test2_Slider_FillArea_FillRect = SliderOption_Test2_Slider_FillArea.transform.Find("Fill").GetComponent<RectTransform>();
+				SliderOption_Test2_Slider_FillArea_FillRect.anchoredPosition3D = new Vector3(-0.5f, 0, 0);
+				SliderOption_Test2_Slider_FillArea_FillRect.anchorMax = new Vector2(0.2075338f, 1f);
+				SliderOption_Test2_Slider_FillArea_FillRect.sizeDelta = new Vector2(0, -3f);
+				var SliderOption_Test2_Slider_HandleSlideArea = SliderOption_Test2_Slider.transform.Find("Handle Slide Area").gameObject;
+				SliderOption_Test2_Slider_HandleSlideArea.GetComponent<RectTransform>().sizeDelta = new Vector2(-5.8f, 0);
+				/*var SliderOption_Test2_Slider_HandleSlideArea_HandleRect = SliderOption_Test2_Slider_HandleSlideArea.transform.Find("Handle").GetComponent<RectTransform>();
+				SliderOption_Test2_Slider_HandleSlideArea_HandleRect.anchoredPosition3D = new Vector3(-1.9f, 0, 0);
+				SliderOption_Test2_Slider_HandleSlideArea_HandleRect.anchorMin = new Vector2(0.2f, 0); //0.20753381f
+				SliderOption_Test2_Slider_HandleSlideArea_HandleRect.anchorMax = new Vector2(0.2f, 1f);
+				SliderOption_Test2_Slider_HandleSlideArea_HandleRect.sizeDelta = new Vector2(10.8f, 0);*/
+				SliderOption_Test2_Slider_HandleSlideArea.transform.Find("Handle").gameObject.SetActive(false);
+
+				SliderOption_Test2_Slider.transform.SetParent(SliderOption_Test2.transform, false);
+				#endregion Slider
+
+				#region InputField
+				GameObject InputFieldOption_Test3 = DefaultControls.CreateButton(resources);
+				InputFieldOption_Test3.name = "InputFieldOption_Test3";
+				var inputFieldTest3Image = InputFieldOption_Test3.GetComponent<Image>();
+				inputFieldTest3Image.sprite = Option_Content_BG;
+				inputFieldTest3Image.type = Image.Type.Simple;
+				inputFieldTest3Image.color = Color.white;
+				var inputFieldTest3Button = InputFieldOption_Test3.GetComponent<Button>();
+				inputFieldTest3Button.transition = Selectable.Transition.SpriteSwap;
+				inputFieldTest3Button.spriteState = new SpriteState()
+				{
+					highlightedSprite = Option_Content_Highlight_BG,
+					pressedSprite = Option_Content_Highlight_BG
+				};
+				var InputFieldOption_Test3Rect = InputFieldOption_Test3.GetComponent<RectTransform>();
+				var InputFieldOption_Test3BehaviourInputField = InputFieldOption_Test3.AddComponent<UIOptionsBehaviourInputField>();
+
+				InputFieldOption_Test3.transform.SetParent(content1.transform, false);
+
+				GameObject InputFieldOption_Test3_Label = InputFieldOption_Test3.transform.Find("Text").gameObject;
+				var InputFieldOption_Test3_LabelText = InputFieldOption_Test3_Label.GetComponent<Text>();
+				InputFieldOption_Test3_LabelText.text = "Test3";
+				InputFieldOption_Test3_LabelText.alignment = TextAnchor.MiddleLeft;
+				InputFieldOption_Test3_LabelText.font = ExoSemiBold;
+				InputFieldOption_Test3_LabelText.fontSize = 15;
+				InputFieldOption_Test3_LabelText.color = Color.white;
+				var InputFieldOption_Test3_LabelRect = InputFieldOption_Test3_Label.GetComponent<RectTransform>();
+				InputFieldOption_Test3_LabelRect.anchoredPosition3D = new Vector3(-59.7f, 0, 0);
+				InputFieldOption_Test3_LabelRect.anchorMin = Vector2.zero;
+				InputFieldOption_Test3_LabelRect.anchorMax = Vector2.one;
+				InputFieldOption_Test3_LabelRect.pivot = Vector2.one / 2;
+				InputFieldOption_Test3_LabelRect.sizeDelta = new Vector2(-157.9f, 0);
+				var InputFieldOption_Test3_LabelShadow = InputFieldOption_Test3_Label.AddComponent<Shadow>();
+				InputFieldOption_Test3_LabelShadow.effectColor = new Color(0, 0, 0, 0.5f);
+				InputFieldOption_Test3_LabelShadow.effectDistance = new Vector2(1f, -1f);
+
+				var InputFieldOption_Test3_InputField = DefaultControls.CreateInputField(new DefaultControls.Resources()
+				{
+					inputField = Options_Unticked
+				});
+				var InputFieldOption_Test3_InputFieldInputField = InputFieldOption_Test3_InputField.GetComponent<InputField>();
+				BehaviourInputField_m_Target.SetValue(InputFieldOption_Test3BehaviourInputField, InputFieldOption_Test3_InputFieldInputField);
+				InputFieldOption_Test3_InputFieldInputField.transition = Selectable.Transition.None;
+				var InputFieldOption_Test3_InputFieldRect = InputFieldOption_Test3_InputField.GetComponent<RectTransform>();
+				InputFieldOption_Test3_InputFieldRect.anchoredPosition3D = new Vector3(174f, 0, 0);
+				InputFieldOption_Test3_InputFieldRect.sizeDelta = new Vector2(202f, 30f);
+
+				var InputFieldOption_Test3_InputField_Placeholder = InputFieldOption_Test3_InputField.transform.Find("Placeholder").gameObject;
+				var InputFieldOption_Test3_InputField_PlaceholderRect = InputFieldOption_Test3_InputField_Placeholder.GetComponent<RectTransform>();
+				var InputFieldOption_Test3_InputField_PlaceholderText = InputFieldOption_Test3_InputField_Placeholder.GetComponent<Text>();
+				InputFieldOption_Test3_InputField_PlaceholderText.text = "";
+				InputFieldOption_Test3_InputField_PlaceholderText.alignment = TextAnchor.MiddleLeft;
+				InputFieldOption_Test3_InputField_PlaceholderText.font = ExoRegular;
+				InputFieldOption_Test3_InputField_PlaceholderText.fontSize = 14;
+				InputFieldOption_Test3_InputField_PlaceholderText.fontStyle = FontStyle.Normal;
+				InputFieldOption_Test3_InputField_PlaceholderText.color = Color.white;
+				InputFieldOption_Test3_InputField_PlaceholderText.lineSpacing = 1;
+
+				var InputFieldOption_Test3_InputField_Text = InputFieldOption_Test3_InputField.transform.Find("Text").gameObject;
+				var InputFieldOption_Test3_InputField_TextRect = InputFieldOption_Test3_InputField_Text.GetComponent<RectTransform>();
+				var InputFieldOption_Test3_InputField_TextText = InputFieldOption_Test3_InputField_Text.GetComponent<Text>();
+				InputFieldOption_Test3_InputField_TextText.text = "";
+				InputFieldOption_Test3_InputField_TextText.alignment = TextAnchor.MiddleLeft;
+				InputFieldOption_Test3_InputField_TextText.font = ExoRegular;
+				InputFieldOption_Test3_InputField_TextText.fontSize = 14;
+				InputFieldOption_Test3_InputField_TextText.fontStyle = FontStyle.Normal;
+				InputFieldOption_Test3_InputField_TextText.color = Color.white;
+				InputFieldOption_Test3_InputField_TextText.lineSpacing = 1;
+
+				InputFieldOption_Test3_InputField.transform.SetParent(InputFieldOption_Test3.transform, false);
+				#endregion InputField
+
+
+				midGroup.CalculateLayoutInputHorizontal();
+				midGroup.CalculateLayoutInputVertical();
+				midGroup.SetLayoutHorizontal();
+				midGroup.SetLayoutVertical();
+
 				content2Group.CalculateLayoutInputHorizontal();
 				content2Group.CalculateLayoutInputVertical();
 				content2Group.SetLayoutHorizontal();
@@ -457,14 +646,6 @@ namespace Exund.ModOptionsTab
 				content1Group.SetLayoutHorizontal();
 				content1Group.SetLayoutVertical();
 
-				/*
-
-				*/
-
-				midGroup.CalculateLayoutInputHorizontal();
-				midGroup.CalculateLayoutInputVertical();
-				midGroup.SetLayoutHorizontal();
-				midGroup.SetLayoutVertical();
 				// Push the new tab to the arrays
 				m_OptionsTabs.SetValue(__instance, optionsTabs);
 				m_OptionsElements.SetValue(__instance, optionsElements);
