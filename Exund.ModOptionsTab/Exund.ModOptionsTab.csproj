@@ -78,6 +78,7 @@
   <ItemGroup>
     <Compile Include="ModOptionsTabMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UIElements.cs" />
     <Compile Include="UIOptionsMod.cs" />
   </ItemGroup>
   <ItemGroup>

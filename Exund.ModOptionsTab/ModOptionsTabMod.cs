@@ -82,6 +82,7 @@ namespace Exund.ModOptionsTab
 					}
 					if (item is Selectable se)
 					{
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "interactable", se.interactable);
 						if (se.image)
 						{
 							tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "image", se.image.name);
@@ -110,6 +111,10 @@ namespace Exund.ModOptionsTab
 							default: break;
 						}
 					}
+					if(item is Dropdown dd)
+					{
+						
+					}
 					tree.AppendLine();
 				} catch { }
 			}
@@ -124,6 +129,11 @@ namespace Exund.ModOptionsTab
 			}
 			return tree.ToString();
 		}
+
+		public static GameObject CreateOptionEntry(string Title, string Name)
+		{
+			return new GameObject();
+		}
 	}
 
 	static class Patches
@@ -135,8 +145,12 @@ namespace Exund.ModOptionsTab
 		static FieldInfo BehaviourSlider_m_Target;
 		static FieldInfo BehaviourSlider_m_FSM;
 		static MethodInfo BehaviourSlider_OnPool;
-		static FieldInfo BehaviourSeed_m_Target;
+		//static FieldInfo BehaviourSeed_m_Target;
 		static FieldInfo BehaviourInputField_m_Target;
+		static FieldInfo BehaviourDropdown_m_Target;
+		static FieldInfo BehaviourDropdown_m_FSM;
+		static MethodInfo BehaviourDropdown_OnPool;
+		static MethodInfo BehaviourDropdown_OnEnable;
 
 		static Patches()
 		{
@@ -150,11 +164,16 @@ namespace Exund.ModOptionsTab
 			BehaviourSlider_m_Target = BehaviourSliderType.GetField("m_Target", privateFlags);
 			BehaviourSlider_m_FSM = BehaviourSliderType.GetField("m_FSM", privateFlags);
 			BehaviourSlider_OnPool = BehaviourSliderType.GetMethod("OnPool", privateFlags);
-			BehaviourSeed_m_Target = typeof(UIOptionsBehaviourSeedGenerator).GetField("m_Target", privateFlags);
+			//BehaviourSeed_m_Target = typeof(UIOptionsBehaviourSeedGenerator).GetField("m_Target", privateFlags);
 			BehaviourInputField_m_Target = typeof(UIOptionsBehaviourInputField).GetField("m_Target", privateFlags);
+			Type BehaviourDropdownType = typeof(UIOptionsBehaviourDropdown);
+			BehaviourDropdown_m_Target = BehaviourDropdownType.GetField("m_Target", privateFlags);
+			BehaviourDropdown_m_FSM = BehaviourDropdownType.GetField("m_FSM", privateFlags);
+			BehaviourDropdown_OnPool = BehaviourDropdownType.GetMethod("OnPool", privateFlags);
+			BehaviourDropdown_OnEnable = BehaviourDropdownType.GetMethod("OnEnable", privateFlags);
 		}
 
-		[HarmonyPatch(typeof(UIOptionsBehaviourSeedGenerator), "OnEnable")]
+		/*[HarmonyPatch(typeof(UIOptionsBehaviourSeedGenerator), "OnEnable")]
 		internal static class UIOptionsBehaviourSeedGeneratorOnEnable
 		{
 			private static void Postfix(ref UIOptionsBehaviourSeedGenerator __instance)
@@ -162,7 +181,7 @@ namespace Exund.ModOptionsTab
 				var input = (InputField)BehaviourSeed_m_Target.GetValue(__instance);
 				Console.WriteLine(UIUtilities.GetComponentTree(input.gameObject));
 			}
-		}
+		}*/
 
 		[HarmonyPatch(typeof(UIOptionsBehaviourSlider), "OnEnable")]
 		internal static class UIOptionsBehaviourSliderOnEnable
@@ -172,6 +191,15 @@ namespace Exund.ModOptionsTab
 				if (BehaviourSlider_m_FSM.GetValue(__instance) == null) BehaviourSlider_OnPool.Invoke(__instance, new object[0]);
 			}
 		}
+
+		/*[HarmonyPatch(typeof(UIOptionsBehaviourDropdown), "OnEnable")]
+		internal static class UIOptionsBehaviourDropdownOnEnable
+		{
+			private static void Prefix(ref UIOptionsBehaviourDropdown __instance)
+			{
+				if (BehaviourDropdown_m_FSM.GetValue(__instance) == null) BehaviourDropdown_OnPool.Invoke(__instance, new object[0]);
+			}
+		}*/
 
 		[HarmonyPatch(typeof(UIScreenOptions), "Awake")]
 		internal static class UIScreenOptionsAwake
@@ -255,7 +283,7 @@ namespace Exund.ModOptionsTab
 
 				Transform parent = optionsElements[0].gameObject.transform.parent;
 
-				// Acquire resources
+				/*// Acquire resources
 				var fonts = Resources.FindObjectsOfTypeAll<Font>();
 				var ExoSemiBold = fonts.First(f => f.name == "Exo-SemiBold");
 				var ExoRegular = fonts.First(f => f.name == "Exo-Regular");
@@ -267,7 +295,7 @@ namespace Exund.ModOptionsTab
 				var Option_Content_Highlight_BG = sprites.First(f => f.name == "Option_Content_Highlight_BG");
 				var Slider_BG = sprites.First(f => f.name == "Slider_BG");
 				var Slider_Fill_BG = sprites.First(f => f.name == "Slider_Fill_BG");
-				var Knob = sprites.First(f => f.name == "Knob");
+				var Knob = sprites.First(f => f.name == "Knob");*/
 
 				// Give new tab a UIOptions panel and position to reference
 				DefaultControls.Resources resources = default(DefaultControls.Resources);
@@ -328,7 +356,7 @@ namespace Exund.ModOptionsTab
 				var title1 = category1_title.GetComponent<Text>();
 				title1.text = "LEFT SIDE";
 				title1.alignment = TextAnchor.MiddleCenter;
-				title1.font = ExoSemiBold;
+				title1.font = UIElements.ExoSemiBold;
 				title1.fontSize = 16;
 				title1.color = Color.white;
 				var title1Rect = category1_title.GetComponent<RectTransform>();
@@ -350,7 +378,7 @@ namespace Exund.ModOptionsTab
 				var title2 = category2_title.GetComponent<Text>();
 				title2.text = "RIGHT SIDE";
 				title2.alignment = TextAnchor.MiddleCenter;
-				title2.font = ExoSemiBold;
+				title2.font = UIElements.ExoSemiBold;
 				title2.fontSize = 16;
 				title2.color = Color.white;
 				var title2Rect = category2_title.GetComponent<RectTransform>();
@@ -366,7 +394,7 @@ namespace Exund.ModOptionsTab
 				GameObject mid_panel = DefaultControls.CreatePanel(resources);
 				mid_panel.name = "Mid Panel";
 				var midImage = mid_panel.GetComponent<Image>();
-				midImage.sprite = Option_BG;
+				midImage.sprite = UIElements.Option_BG;
 				midImage.type = Image.Type.Simple;
 				midImage.color = Color.white;
 				var midRect = mid_panel.GetComponent<RectTransform>();
@@ -388,7 +416,7 @@ namespace Exund.ModOptionsTab
 				GameObject content1 = DefaultControls.CreatePanel(resources);
 				content1.name = "Content 1";
 				var content1Image = content1.GetComponent<Image>();
-				content1Image.sprite = Option_Content_BG;
+				content1Image.sprite = UIElements.Option_Content_BG;
 				content1Image.type = Image.Type.Simple;
 				content1Image.color = Color.white;
 				var content1Group = content1.AddComponent<VerticalLayoutGroup>();
@@ -403,45 +431,16 @@ namespace Exund.ModOptionsTab
 
 				#region Toggle
 				// Checkbox element for testing
-				GameObject CheckboxOption_Test = DefaultControls.CreateButton(resources);
-				CheckboxOption_Test.name = "CheckboxOption_Test";
-				var checkboxTestImage = CheckboxOption_Test.GetComponent<Image>();
-				checkboxTestImage.sprite = Option_Content_BG;
-				checkboxTestImage.type = Image.Type.Simple;
-				checkboxTestImage.color = Color.white;
-				var checkboxTestButton = CheckboxOption_Test.GetComponent<Button>();
-				checkboxTestButton.transition = Selectable.Transition.SpriteSwap;
-				checkboxTestButton.spriteState = new SpriteState()
-				{
-					highlightedSprite = Option_Content_Highlight_BG,
-					pressedSprite = Option_Content_Highlight_BG
-				};
-				var CheckboxOption_TestRect = CheckboxOption_Test.GetComponent<RectTransform>();
+				GameObject CheckboxOption_Test = UIElements.CreateOptionEntry("Test", "CheckboxOption_Test");
+
 				CheckboxOption_Test.AddComponent<UINavigationEntryPoint>();
 				var CheckboxOption_TestBehaviourToggle = CheckboxOption_Test.AddComponent<UIOptionsBehaviourToggle>();
-				
+
 				CheckboxOption_Test.transform.SetParent(content1.transform, false);
 
-				GameObject CheckboxOption_Test_Label = CheckboxOption_Test.transform.Find("Text").gameObject;
-				var CheckboxOption_Test_LabelText = CheckboxOption_Test_Label.GetComponent<Text>();
-				CheckboxOption_Test_LabelText.text = "Test";
-				CheckboxOption_Test_LabelText.alignment = TextAnchor.MiddleLeft;
-				CheckboxOption_Test_LabelText.font = ExoSemiBold;
-				CheckboxOption_Test_LabelText.fontSize = 15;
-				CheckboxOption_Test_LabelText.color = Color.white;
-				var CheckboxOption_Test_LabelRect = CheckboxOption_Test_Label.GetComponent<RectTransform>();
-				CheckboxOption_Test_LabelRect.anchoredPosition3D = new Vector3(-59.7f, 0, 0);
-				CheckboxOption_Test_LabelRect.anchorMin = Vector2.zero;
-				CheckboxOption_Test_LabelRect.anchorMax = Vector2.one;
-				CheckboxOption_Test_LabelRect.pivot = Vector2.one / 2;
-				CheckboxOption_Test_LabelRect.sizeDelta = new Vector2(-157.9f, 0);
-				var CheckboxOption_Test_LabelShadow = CheckboxOption_Test_Label.AddComponent<Shadow>();
-				CheckboxOption_Test_LabelShadow.effectColor = new Color(0, 0, 0, 0.5f);
-				CheckboxOption_Test_LabelShadow.effectDistance = new Vector2(1f, -1f);
-
 				GameObject temp = DefaultControls.CreateToggle(new DefaultControls.Resources() {
-					standard = Options_Unticked,
-					checkmark = Options_Ticked
+					standard = UIElements.Options_Unticked,
+					checkmark = UIElements.Options_Ticked
 				});
 				var CheckboxOption_Test_Toggle = temp.transform.Find("Background").gameObject;
 				CheckboxOption_Test_Toggle.name = "TickBox";
@@ -474,7 +473,7 @@ namespace Exund.ModOptionsTab
 				GameObject content2 = DefaultControls.CreatePanel(resources);
 				content2.name = "Content 2";
 				var content2Image = content2.GetComponent<Image>();
-				content2Image.sprite = Option_Content_BG;
+				content2Image.sprite = UIElements.Option_Content_BG;
 				content2Image.type = Image.Type.Simple;
 				content2Image.color = Color.white;
 				var content2Group = content2.AddComponent<VerticalLayoutGroup>();
@@ -487,48 +486,19 @@ namespace Exund.ModOptionsTab
 				content2Group.padding = new RectOffset(0, 0, 5, 0);
 				content2.transform.SetParent(mid_panel.transform, false);
 
-
 				#region Slider
-				GameObject SliderOption_Test2 = DefaultControls.CreateButton(resources);
-				SliderOption_Test2.name = "SliderOption_Test2";
-				var sliderTest2Image = SliderOption_Test2.GetComponent<Image>();
-				sliderTest2Image.sprite = Option_Content_BG;
-				sliderTest2Image.type = Image.Type.Simple;
-				sliderTest2Image.color = Color.white;
-				var sliderTest2Button = SliderOption_Test2.GetComponent<Button>();
-				sliderTest2Button.transition = Selectable.Transition.SpriteSwap;
-				sliderTest2Button.spriteState = new SpriteState()
-				{
-					highlightedSprite = Option_Content_Highlight_BG,
-					pressedSprite = Option_Content_Highlight_BG
-				};
+				GameObject SliderOption_Test2 = UIElements.CreateOptionEntry("Test2", "SliderOption_Test2");		
+
 				var SliderOption_Test2Rect = SliderOption_Test2.GetComponent<RectTransform>();
 				var SliderOption_Test2BehaviourSlider = SliderOption_Test2.AddComponent<UIOptionsBehaviourSlider>();
 
 				SliderOption_Test2.transform.SetParent(content2.transform, false);
 
-				GameObject SliderOption_Test2_Label = SliderOption_Test2.transform.Find("Text").gameObject;
-				var SliderOption_Test2_LabelText = SliderOption_Test2_Label.GetComponent<Text>();
-				SliderOption_Test2_LabelText.text = "Test2";
-				SliderOption_Test2_LabelText.alignment = TextAnchor.MiddleLeft;
-				SliderOption_Test2_LabelText.font = ExoSemiBold;
-				SliderOption_Test2_LabelText.fontSize = 15;
-				SliderOption_Test2_LabelText.color = Color.white;
-				var SliderOption_Test2_LabelRect = SliderOption_Test2_Label.GetComponent<RectTransform>();
-				SliderOption_Test2_LabelRect.anchoredPosition3D = new Vector3(-59.7f, 0, 0);
-				SliderOption_Test2_LabelRect.anchorMin = Vector2.zero;
-				SliderOption_Test2_LabelRect.anchorMax = Vector2.one;
-				SliderOption_Test2_LabelRect.pivot = Vector2.one / 2;
-				SliderOption_Test2_LabelRect.sizeDelta = new Vector2(-157.9f, 0);
-				var SliderOption_Test2_LabelShadow = SliderOption_Test2_Label.AddComponent<Shadow>();
-				SliderOption_Test2_LabelShadow.effectColor = new Color(0, 0, 0, 0.5f);
-				SliderOption_Test2_LabelShadow.effectDistance = new Vector2(1f, -1f);
-
 				var SliderOption_Test2_Slider = DefaultControls.CreateSlider(new DefaultControls.Resources()
 				{
-					background = Slider_BG,
-					standard = Slider_Fill_BG,
-					knob = Knob
+					background = UIElements.Slider_BG,
+					standard = UIElements.Slider_Fill_BG,
+					knob = UIElements.Knob
 				});
 				var SliderOption_Test2_SliderSlider = SliderOption_Test2_Slider.GetComponent<Slider>();
 				BehaviourSlider_m_Target.SetValue(SliderOption_Test2BehaviourSlider, SliderOption_Test2_SliderSlider);
@@ -559,44 +529,16 @@ namespace Exund.ModOptionsTab
 				#endregion Slider
 
 				#region InputField
-				GameObject InputFieldOption_Test3 = DefaultControls.CreateButton(resources);
-				InputFieldOption_Test3.name = "InputFieldOption_Test3";
-				var inputFieldTest3Image = InputFieldOption_Test3.GetComponent<Image>();
-				inputFieldTest3Image.sprite = Option_Content_BG;
-				inputFieldTest3Image.type = Image.Type.Simple;
-				inputFieldTest3Image.color = Color.white;
-				var inputFieldTest3Button = InputFieldOption_Test3.GetComponent<Button>();
-				inputFieldTest3Button.transition = Selectable.Transition.SpriteSwap;
-				inputFieldTest3Button.spriteState = new SpriteState()
-				{
-					highlightedSprite = Option_Content_Highlight_BG,
-					pressedSprite = Option_Content_Highlight_BG
-				};
+				GameObject InputFieldOption_Test3 = UIElements.CreateOptionEntry("Test3", "InputFieldOption_Test3");
+
 				var InputFieldOption_Test3Rect = InputFieldOption_Test3.GetComponent<RectTransform>();
 				var InputFieldOption_Test3BehaviourInputField = InputFieldOption_Test3.AddComponent<UIOptionsBehaviourInputField>();
 
 				InputFieldOption_Test3.transform.SetParent(content1.transform, false);
 
-				GameObject InputFieldOption_Test3_Label = InputFieldOption_Test3.transform.Find("Text").gameObject;
-				var InputFieldOption_Test3_LabelText = InputFieldOption_Test3_Label.GetComponent<Text>();
-				InputFieldOption_Test3_LabelText.text = "Test3";
-				InputFieldOption_Test3_LabelText.alignment = TextAnchor.MiddleLeft;
-				InputFieldOption_Test3_LabelText.font = ExoSemiBold;
-				InputFieldOption_Test3_LabelText.fontSize = 15;
-				InputFieldOption_Test3_LabelText.color = Color.white;
-				var InputFieldOption_Test3_LabelRect = InputFieldOption_Test3_Label.GetComponent<RectTransform>();
-				InputFieldOption_Test3_LabelRect.anchoredPosition3D = new Vector3(-59.7f, 0, 0);
-				InputFieldOption_Test3_LabelRect.anchorMin = Vector2.zero;
-				InputFieldOption_Test3_LabelRect.anchorMax = Vector2.one;
-				InputFieldOption_Test3_LabelRect.pivot = Vector2.one / 2;
-				InputFieldOption_Test3_LabelRect.sizeDelta = new Vector2(-157.9f, 0);
-				var InputFieldOption_Test3_LabelShadow = InputFieldOption_Test3_Label.AddComponent<Shadow>();
-				InputFieldOption_Test3_LabelShadow.effectColor = new Color(0, 0, 0, 0.5f);
-				InputFieldOption_Test3_LabelShadow.effectDistance = new Vector2(1f, -1f);
-
 				var InputFieldOption_Test3_InputField = DefaultControls.CreateInputField(new DefaultControls.Resources()
 				{
-					inputField = Options_Unticked
+					inputField = UIElements.Options_Unticked
 				});
 				var InputFieldOption_Test3_InputFieldInputField = InputFieldOption_Test3_InputField.GetComponent<InputField>();
 				BehaviourInputField_m_Target.SetValue(InputFieldOption_Test3BehaviourInputField, InputFieldOption_Test3_InputFieldInputField);
@@ -610,7 +552,7 @@ namespace Exund.ModOptionsTab
 				var InputFieldOption_Test3_InputField_PlaceholderText = InputFieldOption_Test3_InputField_Placeholder.GetComponent<Text>();
 				InputFieldOption_Test3_InputField_PlaceholderText.text = "";
 				InputFieldOption_Test3_InputField_PlaceholderText.alignment = TextAnchor.MiddleLeft;
-				InputFieldOption_Test3_InputField_PlaceholderText.font = ExoRegular;
+				InputFieldOption_Test3_InputField_PlaceholderText.font = UIElements.ExoRegular;
 				InputFieldOption_Test3_InputField_PlaceholderText.fontSize = 14;
 				InputFieldOption_Test3_InputField_PlaceholderText.fontStyle = FontStyle.Normal;
 				InputFieldOption_Test3_InputField_PlaceholderText.color = Color.white;
@@ -621,7 +563,7 @@ namespace Exund.ModOptionsTab
 				var InputFieldOption_Test3_InputField_TextText = InputFieldOption_Test3_InputField_Text.GetComponent<Text>();
 				InputFieldOption_Test3_InputField_TextText.text = "";
 				InputFieldOption_Test3_InputField_TextText.alignment = TextAnchor.MiddleLeft;
-				InputFieldOption_Test3_InputField_TextText.font = ExoRegular;
+				InputFieldOption_Test3_InputField_TextText.font = UIElements.ExoRegular;
 				InputFieldOption_Test3_InputField_TextText.fontSize = 14;
 				InputFieldOption_Test3_InputField_TextText.fontStyle = FontStyle.Normal;
 				InputFieldOption_Test3_InputField_TextText.color = Color.white;
@@ -629,6 +571,104 @@ namespace Exund.ModOptionsTab
 
 				InputFieldOption_Test3_InputField.transform.SetParent(InputFieldOption_Test3.transform, false);
 				#endregion InputField
+
+				#region Dropdown
+				GameObject DropdownOption_Test4 = UIElements.CreateOptionEntry("Test4", "DropdownOption_Test4");
+
+				var DropdownOption_Test4Rect = DropdownOption_Test4.GetComponent<RectTransform>();
+				var DropdownOption_Test4BehaviourDropdown = DropdownOption_Test4.AddComponent<UIOptionsBehaviourDropdown>();
+
+				DropdownOption_Test4.transform.SetParent(content2.transform, false);
+
+				var DropdownOption_Test4_Dropdown = DefaultControls.CreateDropdown(new DefaultControls.Resources()
+				{
+					standard = UIElements.Dropdown_BG,
+					mask = UIElements.UIMask,
+					dropdown = UIElements.Profile_ArrowDown,
+					background = UIElements.ScrollBar_Small_01
+				});
+				var DropdownOption_Test4_DropdownDropdown = DropdownOption_Test4_Dropdown.GetComponent<Dropdown>();
+				BehaviourDropdown_m_Target.SetValue(DropdownOption_Test4BehaviourDropdown, DropdownOption_Test4_DropdownDropdown);
+				BehaviourDropdown_OnPool.Invoke(DropdownOption_Test4BehaviourDropdown, new object[0]);
+				BehaviourDropdown_OnEnable.Invoke(DropdownOption_Test4BehaviourDropdown, new object[0]);
+
+				DropdownOption_Test4BehaviourDropdown.interactable = true;
+				DropdownOption_Test4BehaviourDropdown.ClearOptions();
+				DropdownOption_Test4BehaviourDropdown.AddOptions(new List<string>() { "1", "2", "3" });
+				DropdownOption_Test4_DropdownDropdown.Show();
+
+				DropdownOption_Test4_DropdownDropdown.transition = Selectable.Transition.SpriteSwap;
+				DropdownOption_Test4_DropdownDropdown.spriteState = new SpriteState()
+				{
+					highlightedSprite = UIElements.Dropdown_Highlight_BG
+				};
+				var DropdownOption_Test4_DropdownRect = DropdownOption_Test4_Dropdown.GetComponent<RectTransform>();
+				DropdownOption_Test4_DropdownRect.anchoredPosition3D = new Vector3(174f, 0, 0);
+				DropdownOption_Test4_DropdownRect.sizeDelta = new Vector2(202f, 30f);
+
+				var DropdownOption_Test4_Dropdown_Label = DropdownOption_Test4_Dropdown.transform.Find("Label").gameObject;
+				var DropdownOption_Test4_Dropdown_LabelText = DropdownOption_Test4_Dropdown_Label.GetComponent<Text>();
+				DropdownOption_Test4_Dropdown_LabelText.font = UIElements.ExoSemiBold;
+				DropdownOption_Test4_Dropdown_LabelText.color = Color.white;
+				var DropdownOption_Test4_Dropdown_LabelShadow = DropdownOption_Test4_Dropdown_Label.AddComponent<Shadow>();
+				DropdownOption_Test4_Dropdown_LabelShadow.effectColor = new Color(0, 0, 0, 0.5f);
+				var DropdownOption_Test4_Dropdown_Arrow = DropdownOption_Test4_Dropdown.transform.Find("Arrow").gameObject;
+				var DropdownOption_Test4_Dropdown_ArrowRect = DropdownOption_Test4_Dropdown_Arrow.GetComponent<RectTransform>();
+				DropdownOption_Test4_Dropdown_ArrowRect.sizeDelta = new Vector2(13.1f, 13.1f);
+				var DropdownOption_Test4_Dropdown_ArrowShadow = DropdownOption_Test4_Dropdown_Arrow.AddComponent<Shadow>();
+				DropdownOption_Test4_Dropdown_ArrowShadow.effectColor = new Color(0, 0, 0, 0.5f);
+				var DropdownOption_Test4_Dropdown_Template = DropdownOption_Test4_Dropdown.transform.Find("Template").gameObject;
+				var DropdownOption_Test4_Dropdown_TemplateRect = DropdownOption_Test4_Dropdown_Template.GetComponent<RectTransform>();
+				DropdownOption_Test4_Dropdown_TemplateRect.anchoredPosition3D = Vector3.zero;
+				var DropdownOption_Test4_Dropdown_TemplateImage = DropdownOption_Test4_Dropdown_Template.GetComponent<Image>();
+				DropdownOption_Test4_Dropdown_TemplateImage.sprite = UIElements.Dropdown_Active_BG;
+				var DropdownOption_Test4_Dropdown_TemplateController = DropdownOption_Test4_Dropdown_Template.AddComponent<UIAutoScrollItemController>();
+				var DropdownOption_Test4_Dropdown_Template_Viewport = DropdownOption_Test4_Dropdown_Template.transform.Find("Viewport").gameObject;
+				var DropdownOption_Test4_Dropdown_Template_ViewportRect = DropdownOption_Test4_Dropdown_Template_Viewport.GetComponent<RectTransform>();
+				DropdownOption_Test4_Dropdown_Template_ViewportRect.sizeDelta = new Vector2(-6.8f, 0);
+				var DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item = DropdownOption_Test4_Dropdown_Template_Viewport.transform.Find("Content").Find("Item").gameObject;
+				var DropdownOption_Test4_Dropdown_Template_Viewport_Content_ItemToggle = DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item.GetComponent<Toggle>();
+				DropdownOption_Test4_Dropdown_Template_Viewport_Content_ItemToggle.image.sprite = UIElements.Option_Content_BG;
+				DropdownOption_Test4_Dropdown_Template_Viewport_Content_ItemToggle.transition = Selectable.Transition.SpriteSwap;
+				DropdownOption_Test4_Dropdown_Template_Viewport_Content_ItemToggle.spriteState = new SpriteState()
+				{
+					highlightedSprite = UIElements.Option_Content_Highlight_BG
+				};
+				var DropdownOption_Test4_Dropdown_Template_Viewport_Content_ItemController = DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item.AddComponent<UIAutoScrollItem>();
+				var DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemBackground = DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item.transform.Find("Item Background").gameObject;
+				var DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemBackgroundImage = DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemBackground.GetComponent<Image>();
+				DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemBackgroundImage.sprite = UIElements.Option_Content_BG;
+				var DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemCheckmark = DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item.transform.Find("Item Checkmark").gameObject;
+				DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemCheckmark.SetActive(false);
+				var DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemCheckmarkRect = DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemCheckmark.GetComponent<RectTransform>();
+				DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemCheckmarkRect.anchoredPosition3D = new Vector3(99.1f, 0, 0);
+				var DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemLabel = DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item.transform.Find("Item Label").gameObject;
+				var DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemLabelRect = DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemLabel.GetComponent<RectTransform>();
+				DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemLabelRect.anchoredPosition3D = Vector3.zero;
+				var DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemLabelText = DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemLabel.GetComponent<Text>();
+				DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemLabelText.font = UIElements.ExoSemiBold;
+				DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemLabelText.color = Color.white;
+				var DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemLabelShadow = DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemLabel.AddComponent<Shadow>();
+				DropdownOption_Test4_Dropdown_Template_Viewport_Content_Item_ItemLabelShadow.effectColor = new Color(0, 0, 0, 0.5f);
+				var DropdownOption_Test4_Dropdown_Template_Scrollbar = DropdownOption_Test4_Dropdown_Template.transform.Find("Scrollbar");
+				var DropdownOption_Test4_Dropdown_Template_ScrollbarRect = DropdownOption_Test4_Dropdown_Template_Scrollbar.GetComponent<RectTransform>();
+				DropdownOption_Test4_Dropdown_Template_ScrollbarRect.anchoredPosition3D = new Vector3(7.9f, -4.9f, 0);
+				DropdownOption_Test4_Dropdown_Template_ScrollbarRect.sizeDelta = new Vector2(14.9f, -9.8f);
+				var DropdownOption_Test4_Dropdown_Template_ScrollbarScrollbar = DropdownOption_Test4_Dropdown_Template_Scrollbar.GetComponent<Scrollbar>();
+				DropdownOption_Test4_Dropdown_Template_ScrollbarScrollbar.image.sprite = UIElements.ScrollBar_Small_01;
+				DropdownOption_Test4_Dropdown_Template_ScrollbarScrollbar.image.color = new Color(1f, 1f, 1f, 0.388f);
+				var DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea = DropdownOption_Test4_Dropdown_Template_Scrollbar.transform.Find("Sliding Area").gameObject;
+				var DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingAreaRect = DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea.GetComponent<RectTransform>();
+				DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingAreaRect.sizeDelta = Vector2.zero;
+				var DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea_Handle = DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea.transform.Find("Handle").gameObject;
+				var DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea_HandleRect = DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea_Handle.GetComponent<RectTransform>();
+				DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea_HandleRect.anchorMax = Vector2.one;
+				DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea_HandleRect.sizeDelta = Vector2.zero;
+				var DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea_HandleImage = DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea_Handle.GetComponent<Image>();
+				DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea_HandleImage.sprite = UIElements.ScrollBar_Small_01;
+
+				DropdownOption_Test4_Dropdown.transform.SetParent(DropdownOption_Test4.transform, false);
+				#endregion Dropdown
 
 
 				midGroup.CalculateLayoutInputHorizontal();
