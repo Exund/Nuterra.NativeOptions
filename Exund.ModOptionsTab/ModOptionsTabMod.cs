@@ -15,6 +15,17 @@ namespace Exund.ModOptionsTab
 		{
 			var harmony = HarmonyInstance.Create("Exund.ModOptionsTab");
 			harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+			var ot = new OptionToggle("Test Toggle", "dev", true);
+			ot.onValueSaved.AddListener(() =>
+			{
+				Console.WriteLine("Test Toggle value saved " + ot.SavedValue);
+			});
+			new OptionRange("Test Slider", "dev", 5f, MaxValue:10f);
+			new OptionText("Test Input", "dev", "Test", ContentType: InputField.ContentType.IntegerNumber);
+			new OptionList<string>("Test Dropdown", "adev", new List<string> { "1", "2", "3", "4", "5", "6", "7" }, 2);
+			new OptionKey("Test Key", "adev", KeyCode.B);
+			new OptionListEnum<UIInputMode>("Test Dropdown 2", "adev", UIInputMode.ControlScheme);
 		}
 	}
 
@@ -72,7 +83,7 @@ namespace Exund.ModOptionsTab
 					if (item is Shadow s)
 					{
 						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "effectColor", s.effectColor.ToString());
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "effectColor", s.effectDistance.ToString());
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "effectDistance", s.effectDistance.ToString());
 					}
 					if (item is Image i)
 					{
@@ -110,8 +121,18 @@ namespace Exund.ModOptionsTab
 								break;
 							default: break;
 						}
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "navigation", se.navigation.ToString());
+						tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "mode", se.navigation.mode.ToString());
+						if(se.navigation.mode == Navigation.Mode.Explicit)
+						{
+							if(se.navigation.selectOnUp) tree.AppendFormat("\n{0}\t\t\t\t\t{1} {2}", tab, "selectOnUp", se.navigation.selectOnUp.name);
+							if(se.navigation.selectOnDown) tree.AppendFormat("\n{0}\t\t\t\t\t{1} {2}", tab, "selectOnDown", se.navigation.selectOnDown.name);
+							if(se.navigation.selectOnLeft) tree.AppendFormat("\n{0}\t\t\t\t\t{1} {2}", tab, "selectOnLeft", se.navigation.selectOnLeft.name);
+							if(se.navigation.selectOnRight) tree.AppendFormat("\n{0}\t\t\t\t\t{1} {2}", tab, "selectOnRight", se.navigation.selectOnRight.name);
+						}
+
 					}
-					if(item is Dropdown dd)
+					if (item is Dropdown dd)
 					{
 						
 					}
@@ -192,14 +213,20 @@ namespace Exund.ModOptionsTab
 			}
 		}
 
-		/*[HarmonyPatch(typeof(UIOptionsBehaviourDropdown), "OnEnable")]
+		[HarmonyPatch(typeof(UIOptionsBehaviourDropdown), "OnEnable")]
 		internal static class UIOptionsBehaviourDropdownOnEnable
 		{
-			private static void Prefix(ref UIOptionsBehaviourDropdown __instance)
+			private static void Postfix(ref UIOptionsBehaviourDropdown __instance)
 			{
-				if (BehaviourDropdown_m_FSM.GetValue(__instance) == null) BehaviourDropdown_OnPool.Invoke(__instance, new object[0]);
+				var m_Target = (Dropdown)BehaviourDropdown_m_Target.GetValue(__instance);
+				if (m_Target && m_Target.template)
+				{
+					var c = m_Target.template.gameObject.GetComponent<Canvas>() ?? m_Target.template.gameObject.AddComponent<Canvas>();
+					c.sortingLayerName = "UI";
+					c.overrideSorting = false;
+				}
 			}
-		}*/
+		}
 
 		[HarmonyPatch(typeof(UIScreenOptions), "Awake")]
 		internal static class UIScreenOptionsAwake
@@ -209,7 +236,6 @@ namespace Exund.ModOptionsTab
                 // Add a tab to the settings
 				int optionsCount = (int)m_OptionsTypeCount.GetValue(__instance) + 1;
 				m_OptionsTypeCount.SetValue(__instance, optionsCount);
-				var ratio = (float)(optionsCount - 1f) / (float)(optionsCount);
 
 				// Get settings tabs to an array
 				Toggle[] optionsTabs = new Toggle[optionsCount];
@@ -220,17 +246,13 @@ namespace Exund.ModOptionsTab
 				modsToggle.transform.SetParent(optionsTabs[optionsCount - 2].transform.parent, false);
 				modsToggle.gameObject.SetActive(true);
 
-				Console.WriteLine(UIUtilities.GetComponentTree(optionsTabs[0].gameObject));
-				Console.WriteLine(UIUtilities.GetComponentTree(modsToggle.gameObject));
-
 				// Clear and assign name
 				GameObject.DestroyImmediate(modsToggle.gameObject.GetComponentInChildren<UILocalisedText>());
 				modsToggle.GetComponentInChildren<Text>().text = "MODS";
 
 				optionsTabs[optionsCount - 1] = modsToggle;
+
 				// Move tabs
-				/*var ratioVector = new Vector2(ratio, 1f);
-				float width = 1f;*/
 				var x = 0f;
 				foreach (var toggle in optionsTabs)
 				{
@@ -238,14 +260,6 @@ namespace Exund.ModOptionsTab
 					RectTransform toggleRect = toggle.GetComponent<RectTransform>();
 					if (toggleRect)
 					{
-						/*//Vector2 anchorMin = toggleRect.anchorMin;
-						//anchorMin.x *= 0.8f;
-						toggleRect.anchorMin *= ratioVector;
-						//Vector2 anchorMax = toggleRect.anchorMax;
-						//anchorMax.x *= 0.8f;
-						toggleRect.anchorMax *= ratioVector;
-						toggleRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, toggleRect.rect.width * ratio);
-						width = toggleRect.rect.width * ratio;*/
 						Vector2 anchorMin = toggleRect.anchorMin;
 						anchorMin.x = x;
 						toggleRect.anchorMin = anchorMin;
@@ -256,46 +270,11 @@ namespace Exund.ModOptionsTab
 					}
 				}
 
-                /*// Position new tab
-				RectTransform modToggleRect = modsToggle.GetComponent<RectTransform>();
-				var rect0 = optionsTabs[0].GetComponent<RectTransform>();
-				var anchorMin = modToggleRect.anchorMin;// /= ratioVector;
-				anchorMin.x = 0.815f;
-				modToggleRect.anchorMin = anchorMin;
-				var anchorMax = modToggleRect.anchorMax;// /= ratioVector;
-				anchorMax.x = 0.965f;
-				modToggleRect.anchorMax = anchorMax;
-
-				modToggleRect.anchoredPosition = Vector2.zero;
-
-				//modToggleRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
-				//modToggleRect.sizeDelta = optionsTabs[0].GetComponent<RectTransform>().sizeDelta;
-
-				optionsTabs[optionsCount - 1] = modsToggle;*/
-
-				Console.WriteLine(UIUtilities.GetComponentTree(optionsTabs[0].gameObject));
-				Console.WriteLine(UIUtilities.GetComponentTree(modsToggle.gameObject));
-
 
 				// Get the tab panels to an array
 				UIOptions[] optionsElements = new UIOptions[optionsCount];
 				((UIOptions[])m_OptionsElements.GetValue(__instance)).CopyTo(optionsElements, 0);
 
-				Transform parent = optionsElements[0].gameObject.transform.parent;
-
-				/*// Acquire resources
-				var fonts = Resources.FindObjectsOfTypeAll<Font>();
-				var ExoSemiBold = fonts.First(f => f.name == "Exo-SemiBold");
-				var ExoRegular = fonts.First(f => f.name == "Exo-Regular");
-				var sprites = Resources.FindObjectsOfTypeAll<Sprite>();
-				var Option_BG = sprites.First(f => f.name == "Option_BG");
-				var Option_Content_BG = sprites.First(f => f.name == "Option_Content_BG");
-				var Options_Unticked = sprites.First(f => f.name == "Options_Unticked");
-				var Options_Ticked = sprites.First(f => f.name == "Options_Ticked");
-				var Option_Content_Highlight_BG = sprites.First(f => f.name == "Option_Content_Highlight_BG");
-				var Slider_BG = sprites.First(f => f.name == "Slider_BG");
-				var Slider_Fill_BG = sprites.First(f => f.name == "Slider_Fill_BG");
-				var Knob = sprites.First(f => f.name == "Knob");*/
 
 				// Give new tab a UIOptions panel and position to reference
 				DefaultControls.Resources resources = default(DefaultControls.Resources);
@@ -304,13 +283,13 @@ namespace Exund.ModOptionsTab
 				GameObject.DestroyImmediate(Mods.GetComponent<Image>());		
 				RectTransform panel_rect = Mods.GetComponent<RectTransform>();
 				RectTransform reference_rect = optionsElements[0].gameObject.GetComponent<RectTransform>();
+				panel_rect.anchoredPosition3D = reference_rect.anchoredPosition3D;
 				panel_rect.anchorMin = reference_rect.anchorMin;
 				panel_rect.anchorMax = reference_rect.anchorMax;
-				panel_rect.anchoredPosition3D = reference_rect.anchoredPosition3D;
-				panel_rect.sizeDelta = reference_rect.sizeDelta;
 				panel_rect.pivot = reference_rect.pivot;
-				optionsElements[optionsCount - 1] = Mods.AddComponent<UIOptionsMod>();
-				Mods.transform.SetParent(parent, false);
+				panel_rect.sizeDelta = reference_rect.sizeDelta;
+				optionsElements[optionsCount - 1] = Mods.AddComponent<UIOptionsMods>();
+				Mods.transform.SetParent(optionsElements[0].gameObject.transform.parent, false);
 
 				// Allow tab to be activatable
 				var instance = __instance;
@@ -319,11 +298,11 @@ namespace Exund.ModOptionsTab
 					if (set)
 					{
 						instance.ShowOptions((UIScreenOptions.OptionsType)(optionsCount - 1));
-						Console.WriteLine(UIUtilities.GetComponentTree(optionsElements[0].gameObject));
+						Console.WriteLine(UIUtilities.GetComponentTree(optionsElements[1].gameObject));
 						Console.WriteLine(UIUtilities.GetComponentTree(Mods));
 					}
 				});
-				((UIOptionsMod)optionsElements[optionsCount - 1]).tab_toggle = modsToggle;
+				((UIOptionsMods)optionsElements[optionsCount - 1]).tab_toggle = modsToggle;
 
 				// Create UI elements
 				GameObject top_panel = DefaultControls.CreatePanel(resources);
@@ -429,8 +408,24 @@ namespace Exund.ModOptionsTab
 				content1Group.padding = new RectOffset(0, 0, 5, 0);
 				content1.transform.SetParent(mid_panel.transform, false);
 
+				GameObject content2 = DefaultControls.CreatePanel(resources);
+				content2.name = "Content 2";
+				var content2Image = content2.GetComponent<Image>();
+				content2Image.sprite = UIElements.Option_Content_BG;
+				content2Image.type = Image.Type.Simple;
+				content2Image.color = Color.white;
+				var content2Group = content2.AddComponent<VerticalLayoutGroup>();
+				content2Group.childAlignment = TextAnchor.UpperCenter;
+				content2Group.childControlWidth = true;
+				content2Group.childControlHeight = true;
+				content2Group.childForceExpandWidth = true;
+				content2Group.childForceExpandHeight = false;
+				content2Group.spacing = 2f;
+				content2Group.padding = new RectOffset(0, 0, 5, 0);
+				content2.transform.SetParent(mid_panel.transform, false);
+
 				#region Toggle
-				// Checkbox element for testing
+				/*// Checkbox element for testing
 				GameObject CheckboxOption_Test = UIElements.CreateOptionEntry("Test", "CheckboxOption_Test");
 
 				CheckboxOption_Test.AddComponent<UINavigationEntryPoint>();
@@ -438,7 +433,8 @@ namespace Exund.ModOptionsTab
 
 				CheckboxOption_Test.transform.SetParent(content1.transform, false);
 
-				GameObject temp = DefaultControls.CreateToggle(new DefaultControls.Resources() {
+				GameObject temp = DefaultControls.CreateToggle(new DefaultControls.Resources()
+				{
 					standard = UIElements.Options_Unticked,
 					checkmark = UIElements.Options_Ticked
 				});
@@ -467,27 +463,11 @@ namespace Exund.ModOptionsTab
 				CheckboxOption_Test_Toggle_TickedSpriteRect.pivot = Vector2.one / 2;
 				CheckboxOption_Test_Toggle_TickedSpriteRect.sizeDelta = Vector2.zero;
 				CheckboxOption_Test_ToggleToggle.graphic = CheckboxOption_Test_Toggle_TickedSprite.GetComponent<Image>();
-				GameObject.DestroyImmediate(temp);
+				GameObject.DestroyImmediate(temp);*/
 				#endregion Toggle
 
-				GameObject content2 = DefaultControls.CreatePanel(resources);
-				content2.name = "Content 2";
-				var content2Image = content2.GetComponent<Image>();
-				content2Image.sprite = UIElements.Option_Content_BG;
-				content2Image.type = Image.Type.Simple;
-				content2Image.color = Color.white;
-				var content2Group = content2.AddComponent<VerticalLayoutGroup>();
-				content2Group.childAlignment = TextAnchor.UpperCenter;
-				content2Group.childControlWidth = true;
-				content2Group.childControlHeight = true;
-				content2Group.childForceExpandWidth = true;
-				content2Group.childForceExpandHeight = false;
-				content2Group.spacing = 2f;
-				content2Group.padding = new RectOffset(0, 0, 5, 0);
-				content2.transform.SetParent(mid_panel.transform, false);
-
 				#region Slider
-				GameObject SliderOption_Test2 = UIElements.CreateOptionEntry("Test2", "SliderOption_Test2");		
+				/*GameObject SliderOption_Test2 = UIElements.CreateOptionEntry("Test2", "SliderOption_Test2");		
 
 				var SliderOption_Test2Rect = SliderOption_Test2.GetComponent<RectTransform>();
 				var SliderOption_Test2BehaviourSlider = SliderOption_Test2.AddComponent<UIOptionsBehaviourSlider>();
@@ -518,18 +498,13 @@ namespace Exund.ModOptionsTab
 				SliderOption_Test2_Slider_FillArea_FillRect.sizeDelta = new Vector2(0, -3f);
 				var SliderOption_Test2_Slider_HandleSlideArea = SliderOption_Test2_Slider.transform.Find("Handle Slide Area").gameObject;
 				SliderOption_Test2_Slider_HandleSlideArea.GetComponent<RectTransform>().sizeDelta = new Vector2(-5.8f, 0);
-				/*var SliderOption_Test2_Slider_HandleSlideArea_HandleRect = SliderOption_Test2_Slider_HandleSlideArea.transform.Find("Handle").GetComponent<RectTransform>();
-				SliderOption_Test2_Slider_HandleSlideArea_HandleRect.anchoredPosition3D = new Vector3(-1.9f, 0, 0);
-				SliderOption_Test2_Slider_HandleSlideArea_HandleRect.anchorMin = new Vector2(0.2f, 0); //0.20753381f
-				SliderOption_Test2_Slider_HandleSlideArea_HandleRect.anchorMax = new Vector2(0.2f, 1f);
-				SliderOption_Test2_Slider_HandleSlideArea_HandleRect.sizeDelta = new Vector2(10.8f, 0);*/
 				SliderOption_Test2_Slider_HandleSlideArea.transform.Find("Handle").gameObject.SetActive(false);
 
-				SliderOption_Test2_Slider.transform.SetParent(SliderOption_Test2.transform, false);
+				SliderOption_Test2_Slider.transform.SetParent(SliderOption_Test2.transform, false);*/
 				#endregion Slider
 
 				#region InputField
-				GameObject InputFieldOption_Test3 = UIElements.CreateOptionEntry("Test3", "InputFieldOption_Test3");
+				/*GameObject InputFieldOption_Test3 = UIElements.CreateOptionEntry("Test3", "InputFieldOption_Test3");
 
 				var InputFieldOption_Test3Rect = InputFieldOption_Test3.GetComponent<RectTransform>();
 				var InputFieldOption_Test3BehaviourInputField = InputFieldOption_Test3.AddComponent<UIOptionsBehaviourInputField>();
@@ -543,6 +518,10 @@ namespace Exund.ModOptionsTab
 				var InputFieldOption_Test3_InputFieldInputField = InputFieldOption_Test3_InputField.GetComponent<InputField>();
 				BehaviourInputField_m_Target.SetValue(InputFieldOption_Test3BehaviourInputField, InputFieldOption_Test3_InputFieldInputField);
 				InputFieldOption_Test3_InputFieldInputField.transition = Selectable.Transition.None;
+				InputFieldOption_Test3_InputFieldInputField.navigation = new Navigation()
+				{
+					mode = Navigation.Mode.None
+				};
 				var InputFieldOption_Test3_InputFieldRect = InputFieldOption_Test3_InputField.GetComponent<RectTransform>();
 				InputFieldOption_Test3_InputFieldRect.anchoredPosition3D = new Vector3(174f, 0, 0);
 				InputFieldOption_Test3_InputFieldRect.sizeDelta = new Vector2(202f, 30f);
@@ -569,11 +548,11 @@ namespace Exund.ModOptionsTab
 				InputFieldOption_Test3_InputField_TextText.color = Color.white;
 				InputFieldOption_Test3_InputField_TextText.lineSpacing = 1;
 
-				InputFieldOption_Test3_InputField.transform.SetParent(InputFieldOption_Test3.transform, false);
+				InputFieldOption_Test3_InputField.transform.SetParent(InputFieldOption_Test3.transform, false);*/
 				#endregion InputField
 
-				#region Dropdown
-				GameObject DropdownOption_Test4 = UIElements.CreateOptionEntry("Test4", "DropdownOption_Test4");
+				#region Dropdown Manual
+				/*GameObject DropdownOption_Test4 = UIElements.CreateOptionEntry("Test4", "DropdownOption_Test4");
 
 				var DropdownOption_Test4Rect = DropdownOption_Test4.GetComponent<RectTransform>();
 				var DropdownOption_Test4BehaviourDropdown = DropdownOption_Test4.AddComponent<UIOptionsBehaviourDropdown>();
@@ -593,9 +572,9 @@ namespace Exund.ModOptionsTab
 				BehaviourDropdown_OnEnable.Invoke(DropdownOption_Test4BehaviourDropdown, new object[0]);
 
 				DropdownOption_Test4BehaviourDropdown.interactable = true;
-				DropdownOption_Test4BehaviourDropdown.ClearOptions();
-				DropdownOption_Test4BehaviourDropdown.AddOptions(new List<string>() { "1", "2", "3" });
-				DropdownOption_Test4_DropdownDropdown.Show();
+				DropdownOption_Test4_DropdownDropdown.ClearOptions();
+				DropdownOption_Test4_DropdownDropdown.AddOptions(new List<string>() { "1", "2", "3" });
+				DropdownOption_Test4_DropdownDropdown.RefreshShownValue();
 
 				DropdownOption_Test4_DropdownDropdown.transition = Selectable.Transition.SpriteSwap;
 				DropdownOption_Test4_DropdownDropdown.spriteState = new SpriteState()
@@ -667,9 +646,54 @@ namespace Exund.ModOptionsTab
 				var DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea_HandleImage = DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea_Handle.GetComponent<Image>();
 				DropdownOption_Test4_Dropdown_Template_Scrollbar_SlidingArea_HandleImage.sprite = UIElements.ScrollBar_Small_01;
 
-				DropdownOption_Test4_Dropdown.transform.SetParent(DropdownOption_Test4.transform, false);
-				#endregion Dropdown
+				//DropdownOption_Test4_Dropdown.transform.SetParent(DropdownOption_Test4.transform, false);*/
+				#endregion Dropdown Manual
 
+				#region Dropdown Copy
+				/*var DropdownOption_Test4 = GameObject.Instantiate(UIElements.DropdownOption_Language);
+				DropdownOption_Test4.name = "DropdownOption_Test4";
+				DropdownOption_Test4.SetActive(true);
+				GameObject.DestroyImmediate(DropdownOption_Test4.GetComponent<UINavigationEntryPoint>());
+				var DropdownOption_Test4_Text = DropdownOption_Test4.transform.Find("Text").gameObject;
+				DropdownOption_Test4_Text.GetComponent<Text>().text = "Test4";
+				GameObject.DestroyImmediate(DropdownOption_Test4_Text.GetComponent<UILocalisedText>());
+				var DropdownOption_Test4_DropdownDropdown = DropdownOption_Test4.GetComponentInChildren<Dropdown>();
+				DropdownOption_Test4_DropdownDropdown.ClearOptions();
+				DropdownOption_Test4_DropdownDropdown.AddOptions(new List<string>() { "1", "2", "3", "4", "5", "6", "7" });
+				DropdownOption_Test4_DropdownDropdown.RefreshShownValue();	
+				DropdownOption_Test4.transform.SetParent(content2.transform, false);*/
+				#endregion Dropdown Copy
+
+				#region Toggle Copy
+				/*var ToggleOption_Test5 = GameObject.Instantiate(UIElements.CheckboxOption_PauseOnFocusLost);
+				ToggleOption_Test5.name = "ToggleOption_Test5";
+				ToggleOption_Test5.SetActive(true);
+				var ToggleOption_Test5_Text = ToggleOption_Test5.transform.Find("Text").gameObject;
+				ToggleOption_Test5_Text.GetComponent<Text>().text = "Test5";
+				GameObject.DestroyImmediate(ToggleOption_Test5_Text.GetComponent<UILocalisedText>());
+				var ToggleOption_Test5_TickBoxToggle = ToggleOption_Test5.GetComponentInChildren<Toggle>();
+				ToggleOption_Test5.transform.SetParent(content1.transform, false);*/
+				#endregion Toggle Copy
+
+				#region Slider Copy
+				/*var SliderOption_Test6 = GameObject.Instantiate(UIElements.SliderOption_HorizontalSensivity);
+				SliderOption_Test6.name = "SliderOption_Test6";
+				SliderOption_Test6.SetActive(true);
+				var SliderOption_Test6_Text = SliderOption_Test6.transform.Find("Text").gameObject;
+				SliderOption_Test6_Text.GetComponent<Text>().text = "Test6";
+				GameObject.DestroyImmediate(SliderOption_Test6_Text.GetComponent<UILocalisedText>());
+				var SliderOption_Test6_SliderSlider = SliderOption_Test6.GetComponentInChildren<Slider>();
+				SliderOption_Test6.transform.SetParent(content2.transform, false);*/
+				#endregion Slider Copy
+
+				UIOptionsMods.MidPanel = mid_panel;
+				UIOptionsMods.Content1 = content1;
+				UIOptionsMods.Content2 = content2;
+
+				/*foreach (var option in UIOptionsMods.Options)
+				{
+					option.UIElement.transform.SetParent(content1.transform, false);
+				}*/
 
 				midGroup.CalculateLayoutInputHorizontal();
 				midGroup.CalculateLayoutInputVertical();
@@ -689,6 +713,7 @@ namespace Exund.ModOptionsTab
 				// Push the new tab to the arrays
 				m_OptionsTabs.SetValue(__instance, optionsTabs);
 				m_OptionsElements.SetValue(__instance, optionsElements);
+				
 			}
 		}
 	}
