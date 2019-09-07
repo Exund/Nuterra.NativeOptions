@@ -70,6 +70,10 @@ namespace Exund.ModOptionsTab
 			dropdown.ClearOptions();
 			dropdown.AddOptions(Enum.GetNames(typeof(T)).ToList());
 			Value = DefaultValue;
+
+			dropdown.onValueChanged.AddListener((v) => {
+				this.Value = (T)Enum.ToObject(typeof(T), v);
+			});
 		}
 
 		public override T Value
@@ -106,6 +110,8 @@ namespace Exund.ModOptionsTab
 			dropdown.AddOptions(Items.Select(i => i.ToString()).ToList());
 			items = Items;
 			Value = DefaultValue;
+
+			dropdown.onValueChanged.AddListener((v) => { this.Value = v; });
 		}
 
 		public T Selected

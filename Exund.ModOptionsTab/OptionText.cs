@@ -21,6 +21,8 @@ namespace Exund.ModOptionsTab
 			input.characterLimit = MaxLength;
 			input.contentType = ContentType;
 			Value = DefaultValue;
+
+			input.onValueChanged.AddListener((v) => { if (v != base.Value) this.Value = v; });
 		}
 
 		public override string Value

@@ -62,15 +62,13 @@ namespace Exund.ModOptionsTab
 		{
 			foreach (var option in m_Options)
 			{
-				Console.WriteLine($"\n{option.name} reset");
-				Console.WriteLine(option.savedValue.ToString() + " " + option.value.ToString() + " " + option.defaultValue.ToString());
 				option.savedValue = option.defaultValue;
 				option.ResetValue();
-				Console.WriteLine(option.savedValue.ToString() + " " + option.value.ToString() + " " + option.defaultValue.ToString());
 			}
 		}
 
 		public override void OnCloseScreen() {
+			if (m_PendingRequest != null) m_PendingRequest.Reset();
 			m_PendingRequest = null;
 		}
 
@@ -80,12 +78,9 @@ namespace Exund.ModOptionsTab
 		{
 			foreach (var option in m_Options)
 			{
-				Console.WriteLine($"\n{option.name} save");
-				Console.WriteLine(option.savedValue.ToString() + " " + option.value.ToString() + " " + option.defaultValue.ToString());
 				option.savedValue = option.value;
 				option.defaultValue = option.savedValue;
 				option.onValueSaved.Invoke();
-				Console.WriteLine(option.savedValue.ToString() + " " + option.value.ToString() + " " + option.defaultValue.ToString());
 			}
 		}
 

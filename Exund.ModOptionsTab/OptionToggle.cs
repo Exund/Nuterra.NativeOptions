@@ -20,6 +20,8 @@ namespace Exund.ModOptionsTab
 			text.GetComponent<Text>().text = Name;
 			toggle = UIElement.GetComponentInChildren<Toggle>();
 			Value = DefaultValue;
+
+			toggle.onValueChanged.AddListener((v) => { this.Value = v; });
 		}
 
 		public override bool Value {

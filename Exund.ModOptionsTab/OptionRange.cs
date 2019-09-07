@@ -25,6 +25,8 @@ namespace Exund.ModOptionsTab
 			slider.minValue = MinValue;
 			slider.maxValue = MaxValue;
 			Value = DefaultValue;
+
+			slider.onValueChanged.AddListener((v) => { this.Value = v; });
 		}
 
 		public override float Value

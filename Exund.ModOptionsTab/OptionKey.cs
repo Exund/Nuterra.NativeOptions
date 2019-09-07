@@ -47,6 +47,11 @@ namespace Exund.ModOptionsTab
 			Value = keyCode;
 		}
 
+		internal void Reset()
+		{
+			Text1.text = m_Value == KeyCode.None ? " " : m_Value.ToString();
+		}
+
 		public override KeyCode Value
 		{
 			get { return m_Value; }
