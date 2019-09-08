@@ -4,6 +4,6 @@
   "Author": "Exund",
   "Version": "1.0.0",
   "Enable": true,
-  "AssemblyName": "Nuterra.NativeOptions.dll",
+  "AssemblyName": "0Nuterra.NativeOptions.dll",
   "EntryMethod": "Nuterra.NativeOptions.NativeOptionsMod.Load"
 }
