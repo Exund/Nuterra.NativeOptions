@@ -29,6 +29,9 @@ namespace Nuterra.NativeOptions
 		public static readonly Sprite Profile_ArrowDown = Sprites.First(f => f.name == "Profile_ArrowDown");
 		public static readonly Sprite ScrollBar_Small_01 = Sprites.First(f => f.name == "ScrollBar_Small_01");
 		public static readonly Sprite Icon_BACK = Sprites.First(f => f.name == "Icon_BACK");
+		public static readonly Sprite Button_BACK = Sprites.First(f => f.name == "Button_BACK");
+		public static readonly Sprite Button__BACK_Highlight_BG = Sprites.First(f => f.name == "Button__BACK_Highlight_BG");
+		public static readonly Sprite Button_Disabled_BG = Sprites.First(f => f.name == "Button_Disabled_BG");
 
 		public static readonly GameObject[] GameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
 		public static readonly GameObject DropdownOption_Language = GameObjects.First(f => f.name == "DropdownOption_Language");

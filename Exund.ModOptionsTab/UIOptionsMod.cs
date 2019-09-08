@@ -17,7 +17,14 @@ namespace Nuterra.NativeOptions
 
 		internal static GameObject Content1;
 		internal static GameObject Content2;
-		internal static GameObject MidPanel;	
+		internal static GameObject MidPanel;
+
+		internal static GameObject PrevPage;
+		internal static GameObject NextPage;
+		internal static GameObject PageInfo;
+
+		private int page_index = 0;
+		private List<Page> pages = new List<Page>();
 
 		public static void AddOption(Option option)
 		{
@@ -132,7 +139,7 @@ namespace Nuterra.NativeOptions
 
 
 
-				List<Page> pages = new List<Page>();
+				
 
 				Page cpage = new Page()
 				{
@@ -155,10 +162,29 @@ namespace Nuterra.NativeOptions
 						ModOptions mo = new ModOptions();
 						mo.options = group.ToList();
 
-						if (mo.options.Count >= 16)
+						if (mo.options.Count >= 16 && mo.options.Count <= 32)
 						{
-							while (mo.options.Count >= 16)
+							Console.WriteLine($"Multi column group {group.Key}");
+							if (cpage.column1.modOptions.Count == 0) cpage.column1 = ccolumn;
+							else if (cpage.column2.modOptions.Count == 0) cpage.column2 = ccolumn;
+							else
 							{
+								pages.Add(cpage);
+								cpage = new Page()
+								{
+									column1 = new Column()
+									{
+										modOptions = new List<ModOptions>()
+									},
+									column2 = new Column()
+									{
+										modOptions = new List<ModOptions>()
+									}
+								};
+							}
+							while (mo.options.Count > 0)
+							{
+								Console.WriteLine($"{group.Key} {mo.options.Count}");
 								if (cpage.column1.modOptions.Count == 0) cpage.column1 = ccolumn;
 								else if (cpage.column2.modOptions.Count == 0) cpage.column2 = ccolumn;
 								else
@@ -176,16 +202,17 @@ namespace Nuterra.NativeOptions
 										}
 									};
 								}
+
 								ccolumn = new Column();
 								ccolumn.modOptions = new List<ModOptions>()
 								{
 									new ModOptions()
 									{
-										options = mo.options.GetRange(0, 16)
+										options = mo.options.GetRange(0, Math.Min(16, mo.options.Count))
 									}
 								};
 
-								mo.options.RemoveRange(0, 16);
+								mo.options.RemoveRange(0, Math.Min(16, mo.options.Count));
 							}
 						}
 						else
@@ -225,25 +252,60 @@ namespace Nuterra.NativeOptions
 					Console.WriteLine(e.ToString());
 				}
 
-				try
+				var prev = PrevPage.GetComponent<Button>();
+				prev.onClick.RemoveAllListeners();
+				prev.onClick.AddListener(() =>
 				{
-					MidPanel.transform.parent.Find("Top Panel/Category 1/Title").GetComponent<Text>().text = pages[0].column1.modOptions[0].options[0].modName;
-					foreach (var modOption in pages[0].column1.modOptions)
-					{
-						if (modOption.options[0] != pages[0].column1.modOptions[0].options[0])
-						{
-							UIElements.CreateCategoryEntry(modOption.options[0].modName).transform.SetParent(Content1.transform, false);
-						}
-						foreach (var option in modOption.options)
-						{
-							option.UIElement.transform.SetParent(Content1.transform, false);
-						}
-					}
+					SetPage(page_index - 1);
+				});
 
-					MidPanel.transform.parent.Find("Top Panel/Category 2/Title").GetComponent<Text>().text = pages[0].column2.modOptions[0].options[0].modName;
-					foreach (var modOption in pages[0].column2.modOptions)
+				var next = NextPage.GetComponent<Button>();
+				next.onClick.RemoveAllListeners();
+				next.onClick.AddListener(() =>
+				{
+					SetPage(page_index + 1);
+				});
+
+				SetPage(0);
+			}
+		}
+
+		void SetPage(int index)
+		{
+			if (index < 0 || index >= pages.Count) return;
+
+			while(Content1.transform.childCount > 0)
+			{
+				Content1.transform.GetChild(0).SetParent(null, false);
+			}
+			while (Content2.transform.childCount > 0)
+			{
+				Content2.transform.GetChild(0).SetParent(null, false);
+			}
+
+			page_index = index;
+			
+			try
+			{
+				MidPanel.transform.parent.Find("Top Panel/Category 1/Title").GetComponent<Text>().text = pages[page_index].column1.modOptions[0].options[0].modName;
+				foreach (var modOption in pages[page_index].column1.modOptions)
+				{
+					if (modOption.options[0] != pages[page_index].column1.modOptions[0].options[0])
 					{
-						if (modOption.options[0] != pages[0].column2.modOptions[0].options[0])
+						UIElements.CreateCategoryEntry(modOption.options[0].modName).transform.SetParent(Content1.transform, false);
+					}
+					foreach (var option in modOption.options)
+					{
+						option.UIElement.transform.SetParent(Content1.transform, false);
+					}
+				}
+
+				if (pages[page_index].column2.modOptions.Count > 0)
+				{
+					MidPanel.transform.parent.Find("Top Panel/Category 2/Title").GetComponent<Text>().text = pages[page_index].column2.modOptions[0].options[0].modName;
+					foreach (var modOption in pages[page_index].column2.modOptions)
+					{
+						if (modOption.options[0] != pages[page_index].column2.modOptions[0].options[0])
 						{
 							UIElements.CreateCategoryEntry(modOption.options[0].modName).transform.SetParent(Content2.transform, false);
 						}
@@ -253,30 +315,40 @@ namespace Nuterra.NativeOptions
 						}
 					}
 				}
-				catch (Exception e)
-				{
-					Console.WriteLine("UI");
-					Console.WriteLine(e.ToString());
-				}
-
-				var midGroup = MidPanel.GetComponent<HorizontalLayoutGroup>();
-				midGroup.CalculateLayoutInputHorizontal();
-				midGroup.CalculateLayoutInputVertical();
-				midGroup.SetLayoutHorizontal();
-				midGroup.SetLayoutVertical();
-
-				var content2Group = Content2.GetComponent<VerticalLayoutGroup>();
-				content2Group.CalculateLayoutInputHorizontal();
-				content2Group.CalculateLayoutInputVertical();
-				content2Group.SetLayoutHorizontal();
-				content2Group.SetLayoutVertical();
-
-				var content1Group = Content1.GetComponent<VerticalLayoutGroup>();
-				content1Group.CalculateLayoutInputHorizontal();
-				content1Group.CalculateLayoutInputVertical();
-				content1Group.SetLayoutHorizontal();
-				content1Group.SetLayoutVertical();
+				else MidPanel.transform.parent.Find("Top Panel/Category 2/Title").GetComponent<Text>().text = "";
 			}
+			catch (Exception e)
+			{
+				Console.WriteLine("UI");
+				Console.WriteLine(e.ToString());
+			}
+
+			var midGroup = MidPanel.GetComponent<HorizontalLayoutGroup>();
+			midGroup.CalculateLayoutInputHorizontal();
+			midGroup.CalculateLayoutInputVertical();
+			midGroup.SetLayoutHorizontal();
+			midGroup.SetLayoutVertical();
+
+			var content2Group = Content2.GetComponent<VerticalLayoutGroup>();
+			content2Group.CalculateLayoutInputHorizontal();
+			content2Group.CalculateLayoutInputVertical();
+			content2Group.SetLayoutHorizontal();
+			content2Group.SetLayoutVertical();
+
+			var content1Group = Content1.GetComponent<VerticalLayoutGroup>();
+			content1Group.CalculateLayoutInputHorizontal();
+			content1Group.CalculateLayoutInputVertical();
+			content1Group.SetLayoutHorizontal();
+			content1Group.SetLayoutVertical();
+
+			var prev = PrevPage.GetComponent<Button>();
+			prev.interactable = page_index - 1 >= 0;
+
+			var next = NextPage.GetComponent<Button>();
+			next.interactable = page_index + 1 < pages.Count;
+
+			var text = PageInfo.GetComponent<Text>();
+			text.text = $"Page {page_index + 1}/{pages.Count}";
 		}
 
 		struct ModOptions

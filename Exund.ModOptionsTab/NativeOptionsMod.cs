@@ -23,9 +23,24 @@ namespace Nuterra.NativeOptions
 			new OptionKey("Test Key", "e", KeyCode.B);
 			new OptionListEnum<UIInputMode>("Test Dropdown 2", "f", UIInputMode.ControlScheme);
 
-			for (int i = 0; i < 24; i++)
+			for (int i = 0; i < 22; i++)
 			{
 				new OptionToggle("Test Toggle" + i, "g", true);
+			}
+
+			for (int i = 0; i < 2; i++)
+			{
+				new OptionToggle("Test Toggle" + i, "h", true);
+			}
+
+			for (int i = 0; i < 2; i++)
+			{
+				new OptionToggle("Test Toggle" + i, "i", true);
+			}
+
+			for (int i = 0; i < 32; i++)
+			{
+				new OptionToggle("Test Toggle" + i, "j", true);
 			}
 		}
 	}
@@ -346,7 +361,7 @@ namespace Nuterra.NativeOptions
 				//page_infoRect.sizeDelta(536.0, 40.0)
 				Text text = page_info.GetComponent<Text>();
 				text.font = UIElements.ExoSemiBold;
-				text.fontSize = 15;
+				text.fontSize = 25;
 				text.color = Color.white;
 				page_info.transform.SetParent(bottom_panel.transform, false);
 
@@ -362,23 +377,34 @@ namespace Nuterra.NativeOptions
 				button_group.childForceExpandHeight = true;
 				button_group.spacing = 0;
 				button_group.padding = new RectOffset(0, 0, 0, 0);
-
 				buttons_panel.transform.SetParent(bottom_panel.transform, false);
 
 				GameObject prev_page = GameObject.Instantiate(UIElements.Button_Back);
 				prev_page.SetActive(true);
+				GameObject.DestroyImmediate(prev_page.GetComponent<UIButtonGoBack>());
 				var prevRect = prev_page.GetComponent<RectTransform>();
 				prevRect.anchoredPosition3D = Vector3.zero;
 				prev_page.GetComponent<Button>().onClick.RemoveAllListeners();
+				var prevState = prev_page.GetComponent<Button>().spriteState;
+				prevState.disabledSprite = UIElements.Button_Disabled_BG;
+				prev_page.GetComponent<Button>().spriteState = prevState;
 				prev_page.transform.SetParent(buttons_panel.transform, false);
 
 				GameObject next_page = GameObject.Instantiate(UIElements.Button_Back);
 				next_page.SetActive(true);
+				GameObject.DestroyImmediate(next_page.GetComponent<UIButtonGoBack>());
 				var nextRect = next_page.GetComponent<RectTransform>();
 				nextRect.anchoredPosition3D = Vector3.zero;
-				nextRect.eulerAngles = new Vector3(0, 180f, 0);
 				next_page.GetComponent<Button>().onClick.RemoveAllListeners();
+				var nextState = next_page.GetComponent<Button>().spriteState;
+				nextState.disabledSprite = UIElements.Button_Disabled_BG;
+				next_page.GetComponent<Button>().spriteState = nextState;
+				next_page.transform.Find("Icon").GetComponent<RectTransform>().localEulerAngles = new Vector3(0, 180f, 0);
 				next_page.transform.SetParent(buttons_panel.transform, false);
+
+				UIOptionsMods.PageInfo = page_info;
+				UIOptionsMods.PrevPage = prev_page;
+				UIOptionsMods.NextPage = next_page;
 
 
 				GameObject top_panel = DefaultControls.CreatePanel(resources);
