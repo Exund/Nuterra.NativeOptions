@@ -131,177 +131,94 @@ namespace Nuterra.NativeOptions
 					with compression : 16
 				*/
 
-				Column ccolumn = new Column();
-				ccolumn.modOptions = new List<ModOptions>();
-
-				Page cpage = new Page()
-				{
-					column1 = ccolumn,
-					column2 = new Column()
-					{
-						modOptions = new List<ModOptions>()
-					}
-				};
 
 				try
 				{
-					var i = 0;
+					var columns = new List<Column>();
 					var ci = 0;
-					var pi = 0;
 					foreach (var group in m_Options.GroupBy(o => o.modName))
 					{
-						ModOptions mo = new ModOptions();
-						mo.options = group.ToList();
-
-						if (mo.options.Count <= 16)
+						if (columns.Count == ci) columns.Add(new Column() { entries = new List<Entry>()});
+						var opts = group.ToList();
+						var num = opts.Count + 1;
+						if (num < 11)
 						{
-							if (ci % 2 == 0)
+							var cc = columns[ci];
+							if (cc.entries.Count + num < 11)
 							{
-								if (ccolumn.modOptions.Sum(m => m.options.Count + 1) + mo.options.Count < 10)
-								{
-									ccolumn.modOptions.Add(mo);
-								}
-								else
-								{
-									ci++;
-									ccolumn = new Column()
-									{
-										modOptions = new List<ModOptions>() { mo }
-									};
-									cpage.column2 = ccolumn;
-								}
+								cc.entries.Add(new Entry(group.Key));
+								cc.entries.AddRange(opts.Select(o => new Entry("", o)));
 							}
 							else
 							{
-								if (ccolumn.modOptions.Sum(m => m.options.Count + 1) + mo.options.Count < 10)
+								ci++;
+								var ccc = new Column()
 								{
-									ccolumn.modOptions.Add(mo);
-								}
-								else
-								{
-									pages.Add(cpage);
-									ci++;
-									ccolumn = new Column()
+									entries = new List<Entry>()
 									{
-										modOptions = new List<ModOptions>() { mo }
-									};
-									pi++;
-									cpage = new Page()
-									{
-										column1 = ccolumn,
-										column2 = new Column()
-										{
-											modOptions = new List<ModOptions>()
-										}
-									};
-									cpage.column1 = ccolumn;
-								}
+										new Entry(group.Key)
+									}
+								};
+								ccc.entries.AddRange(opts.Select(o => new Entry("", o)));
+								columns.Add(ccc);	
 							}
 						}
-						i++;
-
-						Console.WriteLine($"group {group.Key}, i {i}, page {pi}, column {ci}");
-
-						{/* if (mo.options.Count >= 16 && mo.options.Count <= 32)
+						else if (num < 17)
 						{
-							if (cpage.column1.modOptions.Count == 0) cpage.column1 = ccolumn;
-							else if (cpage.column2.modOptions.Count == 0) cpage.column2 = ccolumn;
-							else
+							ci++;
+							var ccc = new Column()
 							{
-								pages.Add(cpage);
-								cpage = new Page()
-								{
-									column1 = new Column()
+								entries = new List<Entry>()
 									{
-										modOptions = new List<ModOptions>()
-									},
-									column2 = new Column()
-									{
-										modOptions = new List<ModOptions>()
+										new Entry(group.Key)
 									}
-								};
-							}
-							Console.WriteLine($"Multi column group {group.Key}");
-							if (cpage.column1.modOptions.Count == 0) cpage.column1 = ccolumn;
-							else if (cpage.column2.modOptions.Count == 0) cpage.column2 = ccolumn;
-							else
-							{
-								pages.Add(cpage);
-								cpage = new Page()
-								{
-									column1 = new Column()
-									{
-										modOptions = new List<ModOptions>()
-									},
-									column2 = new Column()
-									{
-										modOptions = new List<ModOptions>()
-									}
-								};
-							}
-							while (mo.options.Count > 0)
-							{
-								ccolumn = new Column();
-								ccolumn.modOptions = new List<ModOptions>()
-								{
-									new ModOptions()
-									{
-										options = mo.options.GetRange(0, Math.Min(16, mo.options.Count))
-									}
-								};
-
-								mo.options.RemoveRange(0, Math.Min(16, mo.options.Count));
-
-
-								if (cpage.column1.modOptions.Count == 0) cpage.column1 = ccolumn;
-								else if (cpage.column2.modOptions.Count == 0) cpage.column2 = ccolumn;
-								else
-								{
-									pages.Add(cpage);
-									cpage = new Page()
-									{
-										column1 = new Column()
-										{
-											modOptions = new List<ModOptions>()
-										},
-										column2 = new Column()
-										{
-											modOptions = new List<ModOptions>()
-										}
-									};
-								}
-							}
+							};
+							ccc.entries.AddRange(opts.Select(o => new Entry("", o)));
+							columns.Add(ccc);
 						}
 						else
 						{
-							if (ccolumn.modOptions.Sum(m => m.options.Count + 1) + mo.options.Count > 9)
+							var ii = opts.GetRange(0, opts.Count);
+							while (ii.Count > 0)
 							{
-								if (cpage.column1.modOptions.Count == 0) cpage.column1 = ccolumn;
-								else if (cpage.column2.modOptions.Count == 0) cpage.column2 = ccolumn;
-								else
+								ci++;
+								var ccc = new Column()
 								{
-									pages.Add(cpage);
-									cpage = new Page()
+									entries = new List<Entry>()
 									{
-										column1 = new Column()
-										{
-											modOptions = new List<ModOptions>()
-										},
-										column2 = new Column()
-										{
-											modOptions = new List<ModOptions>()
-										}
-									};
-								}
-								ccolumn = new Column();
-								ccolumn.modOptions = new List<ModOptions>();
+										new Entry(group.Key)
+									}
+								};
+								ccc.entries.AddRange(ii.GetRange(0, Math.Min(16, ii.Count)).Select(o => new Entry("", o)));
+								columns.Add(ccc);
+
+								ii.RemoveRange(0, Math.Min(16, ii.Count));
 							}
-							ccolumn.modOptions.Add(mo);
-						} */}
+						}
 					}
-					/*if (cpage.column1.modOptions.Count == 0) cpage.column1 = ccolumn;
-					else if (cpage.column2.modOptions.Count == 0) cpage.column2 = ccolumn;
-					pages.Add(cpage);*/
+
+					pages = new List<Page>();
+					var pi = -1;
+					for (var i = 0; i < columns.Count; i++)
+					{
+						if (i % 2 == 0) pi++;
+						if (pages.Count == pi) pages.Add(new Page() { columns = new List<Column>() });
+						pages[pi].columns.Add(columns[i]);
+
+						Console.WriteLine($"Page {pi}");
+						foreach (var e in columns[i].entries)
+						{
+							Console.Write($"Column {i} ");
+							if(e.title != "")
+							{
+								Console.WriteLine("title " + e.title);
+							}
+							else
+							{
+								Console.WriteLine("name " +e.option.name);
+							}
+						}
+					}
 				}
 				catch (Exception e)
 				{
@@ -344,31 +261,31 @@ namespace Nuterra.NativeOptions
 			
 			try
 			{
-				MidPanel.transform.parent.Find("Top Panel/Category 1/Title").GetComponent<Text>().text = pages[page_index].column1.modOptions[0].options[0].modName;
-				foreach (var modOption in pages[page_index].column1.modOptions)
+				MidPanel.transform.parent.Find("Top Panel/Category 1/Title").GetComponent<Text>().text = pages[page_index].columns[0].entries[0].title;
+				foreach (var entry in pages[page_index].columns[0].entries)
 				{
-					if (modOption.options[0] != pages[page_index].column1.modOptions[0].options[0])
+					if (entry.title != "" && entry.title != pages[page_index].columns[0].entries[0].title)
 					{
-						UIElements.CreateCategoryEntry(modOption.options[0].modName).transform.SetParent(Content1.transform, false);
+						UIElements.CreateCategoryEntry(entry.title).transform.SetParent(Content1.transform, false);
 					}
-					foreach (var option in modOption.options)
+					else if(entry.option != null)
 					{
-						option.UIElement.transform.SetParent(Content1.transform, false);
+						entry.option.UIElement.transform.SetParent(Content1.transform, false);
 					}
 				}
 
-				if (pages[page_index].column2.modOptions.Count > 0)
+				if (pages[page_index].columns.Count > 1)
 				{
-					MidPanel.transform.parent.Find("Top Panel/Category 2/Title").GetComponent<Text>().text = pages[page_index].column2.modOptions[0].options[0].modName;
-					foreach (var modOption in pages[page_index].column2.modOptions)
+					MidPanel.transform.parent.Find("Top Panel/Category 2/Title").GetComponent<Text>().text = pages[page_index].columns[1].entries[0].title;
+					foreach (var entry in pages[page_index].columns[1].entries)
 					{
-						if (modOption.options[0] != pages[page_index].column2.modOptions[0].options[0])
+						if (entry.title != "" && entry.title != pages[page_index].columns[1].entries[0].title)
 						{
-							UIElements.CreateCategoryEntry(modOption.options[0].modName).transform.SetParent(Content2.transform, false);
+							UIElements.CreateCategoryEntry(entry.title).transform.SetParent(Content2.transform, false);
 						}
-						foreach (var option in modOption.options)
+						else if (entry.option != null)
 						{
-							option.UIElement.transform.SetParent(Content2.transform, false);
+							entry.option.UIElement.transform.SetParent(Content2.transform, false);
 						}
 					}
 				}
@@ -408,7 +325,7 @@ namespace Nuterra.NativeOptions
 			text.text = $"Page {page_index + 1}/{pages.Count}";
 		}
 
-		struct ModOptions
+		/*struct ModOptions
 		{
 			public List<Option> options;
 		}
@@ -422,6 +339,28 @@ namespace Nuterra.NativeOptions
 		{
 			public Column column1;
 			public Column column2;
+		}*/
+
+		struct Entry
+		{
+			public string title;
+			public Option option;
+
+			public Entry(string Title = "", Option opt = null)
+			{
+				title = Title;
+				option = opt;
+			}
+		}
+
+		struct Column
+		{
+			public List<Entry> entries;
+		}
+
+		struct Page
+		{
+			public List<Column> columns;
 		}
 	}
 }
