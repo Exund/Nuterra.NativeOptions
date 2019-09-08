@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
-namespace Exund.ModOptionsTab
+namespace Nuterra.NativeOptions
 {
 	public abstract class Option
 	{
@@ -36,6 +36,8 @@ namespace Exund.ModOptionsTab
 			this.value = this.savedValue = this.defaultValue = DefaultValue;
 
 			UIOptionsMods.AddOption(this);
+
+			Console.WriteLine($"New Option {ModName}-{Name} of type {typeof(T).Name} registered");
 		}
 
 		public override void ResetValue()

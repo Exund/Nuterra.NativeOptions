@@ -7,25 +7,26 @@ using UnityEngine;
 using UnityEngine.UI;
 using Harmony;
 
-namespace Exund.ModOptionsTab
+namespace Nuterra.NativeOptions
 {
-	public class ModOptionsTabMod
+	public class NativeOptionsMod
 	{
 		public static void Load()
 		{
-			var harmony = HarmonyInstance.Create("Exund.ModOptionsTab");
+			var harmony = HarmonyInstance.Create("Nuterra.NativeOptions");
 			harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-			var ot = new OptionToggle("Test Toggle", "dev", true);
-			ot.onValueSaved.AddListener(() =>
+			new OptionToggle("Test Toggle", "a", true);
+			new OptionRange("Test Slider", "b", 5f, MaxValue:10f);
+			new OptionText("Test Input", "c", "Test", ContentType: InputField.ContentType.IntegerNumber);
+			new OptionList<string>("Test Dropdown", "d", new List<string> { "1", "2", "3", "4", "5", "6", "7" }, 2);
+			new OptionKey("Test Key", "e", KeyCode.B);
+			new OptionListEnum<UIInputMode>("Test Dropdown 2", "f", UIInputMode.ControlScheme);
+
+			for (int i = 0; i < 24; i++)
 			{
-				Console.WriteLine("Test Toggle value saved " + ot.SavedValue);
-			});
-			new OptionRange("Test Slider", "dev", 5f, MaxValue:10f);
-			new OptionText("Test Input", "dev", "Test", ContentType: InputField.ContentType.IntegerNumber);
-			new OptionList<string>("Test Dropdown", "adev", new List<string> { "1", "2", "3", "4", "5", "6", "7" }, 2);
-			new OptionKey("Test Key", "adev", KeyCode.B);
-			new OptionListEnum<UIInputMode>("Test Dropdown 2", "adev", UIInputMode.ControlScheme);
+				new OptionToggle("Test Toggle" + i, "g", true);
+			}
 		}
 	}
 
@@ -53,15 +54,10 @@ namespace Exund.ModOptionsTab
 						tree.AppendFormat("\n{0}\t\t\tsizeDelta {1}", tab, rect.sizeDelta.ToString());
 						tree.AppendFormat("\n{0}\t\t\tlocalScale {1}", tab, rect.localScale.ToString());
 					}
-					if (item is HorizontalOrVerticalLayoutGroup lg)
+					if (item is LayoutGroup lg)
 					{
 						tree.AppendFormat("\n{0}\t\t\tchildAlignment {1}", tab, lg.childAlignment.ToString());
-						tree.AppendFormat("\n{0}\t\t\tchildControlWidth {1}", tab, lg.childControlWidth);
-						tree.AppendFormat("\n{0}\t\t\tchildControlHeight {1}", tab, lg.childControlHeight);
-						tree.AppendFormat("\n{0}\t\t\tchildForceExpandWidth {1}", tab, lg.childForceExpandWidth);
-						tree.AppendFormat("\n{0}\t\t\tchildForceExpandHeight {1}", tab, lg.childForceExpandHeight);
 						tree.AppendFormat("\n{0}\t\t\tlayoutPriority {1}", tab, lg.layoutPriority);
-						tree.AppendFormat("\n{0}\t\t\tspacing {1}", tab, lg.spacing);
 						tree.AppendFormat("\n{0}\t\t\tpadding {1}", tab, lg.padding);
 						tree.AppendFormat("\n{0}\t\t\tminWidth {1}", tab, lg.minWidth);
 						tree.AppendFormat("\n{0}\t\t\tminHeight {1}", tab, lg.minHeight);
@@ -69,6 +65,23 @@ namespace Exund.ModOptionsTab
 						tree.AppendFormat("\n{0}\t\t\tpreferredHeight {1}", tab, lg.preferredHeight);
 						tree.AppendFormat("\n{0}\t\t\tflexibleWidth {1}", tab, lg.flexibleWidth);
 						tree.AppendFormat("\n{0}\t\t\tflexibleHeight {1}", tab, lg.flexibleHeight);
+					}
+					if (item is HorizontalOrVerticalLayoutGroup hvlg)
+					{	
+						tree.AppendFormat("\n{0}\t\t\tchildControlWidth {1}", tab, hvlg.childControlWidth);
+						tree.AppendFormat("\n{0}\t\t\tchildControlHeight {1}", tab, hvlg.childControlHeight);
+						tree.AppendFormat("\n{0}\t\t\tchildForceExpandWidth {1}", tab, hvlg.childForceExpandWidth);
+						tree.AppendFormat("\n{0}\t\t\tchildForceExpandHeight {1}", tab, hvlg.childForceExpandHeight);						
+						tree.AppendFormat("\n{0}\t\t\tspacing {1}", tab, hvlg.spacing);		
+					}
+					if(item is GridLayoutGroup glg)
+					{
+						tree.AppendFormat("\n{0}\t\t\tcellSize {1}", tab, glg.cellSize.ToString());
+						tree.AppendFormat("\n{0}\t\t\tconstraint {1}", tab, glg.constraint.ToString());
+						tree.AppendFormat("\n{0}\t\t\tconstraintCount {1}", tab, glg.constraintCount);
+						tree.AppendFormat("\n{0}\t\t\tspacing {1}", tab, glg.spacing.ToString());
+						tree.AppendFormat("\n{0}\t\t\tstartAxis {1}", tab, glg.startAxis.ToString());
+						tree.AppendFormat("\n{0}\t\t\tstartCorner {1}", tab, glg.startCorner.ToString());
 					}
 					if (item is Text t)
 					{
@@ -150,11 +163,6 @@ namespace Exund.ModOptionsTab
 			}
 			return tree.ToString();
 		}
-
-		public static GameObject CreateOptionEntry(string Title, string Name)
-		{
-			return new GameObject();
-		}
 	}
 
 	static class Patches
@@ -233,7 +241,7 @@ namespace Exund.ModOptionsTab
 		{
 			private static void Postfix(ref UIScreenOptions __instance)
 			{
-                // Add a tab to the settings
+				// Add a tab to the settings
 				int optionsCount = (int)m_OptionsTypeCount.GetValue(__instance) + 1;
 				m_OptionsTypeCount.SetValue(__instance, optionsCount);
 
@@ -298,6 +306,7 @@ namespace Exund.ModOptionsTab
 					if (set)
 					{
 						instance.ShowOptions((UIScreenOptions.OptionsType)(optionsCount - 1));
+						Console.WriteLine(UIUtilities.GetComponentTree(UIElements.Button_Back));
 						Console.WriteLine(UIUtilities.GetComponentTree(optionsElements[1].gameObject));
 						Console.WriteLine(UIUtilities.GetComponentTree(Mods));
 					}
@@ -305,6 +314,73 @@ namespace Exund.ModOptionsTab
 				((UIOptionsMods)optionsElements[optionsCount - 1]).tab_toggle = modsToggle;
 
 				// Create UI elements
+				GameObject bottom_panel = DefaultControls.CreatePanel(resources);
+				bottom_panel.name = "Bottom Panel";
+				GameObject.DestroyImmediate(bottom_panel.GetComponent<Image>());
+				var bottomRect = bottom_panel.GetComponent<RectTransform>();
+				bottomRect.anchoredPosition3D = new Vector3(0, -289.6f, 0);
+				bottomRect.anchorMin = Vector2.zero;
+				bottomRect.anchorMax = Vector2.one;
+				bottomRect.pivot = Vector2.one / 2;
+				bottomRect.sizeDelta = new Vector2(-60f, -579.2f);
+				var bottomGroup = bottom_panel.AddComponent<GridLayoutGroup>();
+				bottomGroup.childAlignment = TextAnchor.MiddleLeft;
+				bottomGroup.padding = new RectOffset(0, 0, 0, 0);
+				bottomGroup.cellSize = new Vector2(536f, 40f);
+				bottomGroup.constraint = GridLayoutGroup.Constraint.Flexible;
+				//bottomGroup.constraintCount = 2;
+				bottomGroup.spacing = new Vector2(60f, 15f);
+				bottomGroup.startAxis =	GridLayoutGroup.Axis.Vertical;
+				bottomGroup.startCorner = GridLayoutGroup.Corner.UpperLeft;
+
+				bottom_panel.transform.SetParent(Mods.transform, false);
+
+				GameObject page_info = DefaultControls.CreateText(resources);
+				var page_infoRect = page_info.GetComponent<RectTransform>();
+				page_infoRect.anchoredPosition3D = new Vector3(268f, -25.3f, 0);
+				page_infoRect.anchorMin = Vector2.up;
+				page_infoRect.anchorMax = Vector2.up;
+				page_infoRect.offsetMin = new Vector2(0, -45.3f);
+				page_infoRect.offsetMax = new Vector2(536f, -5.3f);
+				page_infoRect.pivot = Vector2.one / 2;
+				//page_infoRect.sizeDelta(536.0, 40.0)
+				Text text = page_info.GetComponent<Text>();
+				text.font = UIElements.ExoSemiBold;
+				text.fontSize = 15;
+				text.color = Color.white;
+				page_info.transform.SetParent(bottom_panel.transform, false);
+
+
+				GameObject buttons_panel = DefaultControls.CreatePanel(resources);
+				buttons_panel.name = "Page Panel";
+				GameObject.DestroyImmediate(buttons_panel.GetComponent<Image>());
+				var button_group = buttons_panel.AddComponent<HorizontalLayoutGroup>();
+				button_group.childAlignment = TextAnchor.MiddleCenter;
+				button_group.childControlWidth = true;
+				button_group.childControlHeight = true;
+				button_group.childForceExpandWidth = true;
+				button_group.childForceExpandHeight = true;
+				button_group.spacing = 0;
+				button_group.padding = new RectOffset(0, 0, 0, 0);
+
+				buttons_panel.transform.SetParent(bottom_panel.transform, false);
+
+				GameObject prev_page = GameObject.Instantiate(UIElements.Button_Back);
+				prev_page.SetActive(true);
+				var prevRect = prev_page.GetComponent<RectTransform>();
+				prevRect.anchoredPosition3D = Vector3.zero;
+				prev_page.GetComponent<Button>().onClick.RemoveAllListeners();
+				prev_page.transform.SetParent(buttons_panel.transform, false);
+
+				GameObject next_page = GameObject.Instantiate(UIElements.Button_Back);
+				next_page.SetActive(true);
+				var nextRect = next_page.GetComponent<RectTransform>();
+				nextRect.anchoredPosition3D = Vector3.zero;
+				nextRect.eulerAngles = new Vector3(0, 180f, 0);
+				next_page.GetComponent<Button>().onClick.RemoveAllListeners();
+				next_page.transform.SetParent(buttons_panel.transform, false);
+
+
 				GameObject top_panel = DefaultControls.CreatePanel(resources);
 				top_panel.name = "Top Panel";
 				GameObject.DestroyImmediate(top_panel.GetComponent<Image>());
@@ -377,11 +453,18 @@ namespace Exund.ModOptionsTab
 				midImage.type = Image.Type.Simple;
 				midImage.color = Color.white;
 				var midRect = mid_panel.GetComponent<RectTransform>();
-				midRect.anchoredPosition3D = new Vector3(0, -21.6f, 0);
+				/*midRect.anchoredPosition3D = new Vector3(0, -21.6f, 0);
 				midRect.anchorMin = Vector2.zero;
 				midRect.anchorMax = Vector2.one;
 				midRect.pivot = Vector2.one / 2;
-				midRect.sizeDelta = new Vector2(-6.3f, -74.8f);
+				midRect.sizeDelta = new Vector2(-6.3f, -74.8f);*/
+				midRect.anchoredPosition3D = new Vector3(0, -4.1f, 0);
+				midRect.anchorMin = Vector2.zero;
+				midRect.anchorMax = Vector2.one;
+				midRect.offsetMin = new Vector2(3.2f, 50.7f);
+				midRect.offsetMax = new Vector2(-3.2f, -59.0f);
+				midRect.pivot = Vector2.one / 2;
+				//midRect.sizeDelta(-6.3, -109.7)
 				var midGroup = mid_panel.AddComponent<HorizontalLayoutGroup>();
 				midGroup.childAlignment = TextAnchor.UpperLeft;
 				midGroup.childControlWidth = true;

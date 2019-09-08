@@ -1,9 +1,0 @@
-{
-  "Id": "exund.modoptionstab",
-  "DisplayName": "Mod Options Tab",
-  "Author": "Exund",
-  "Version": "1.0.0",
-  "Enable": true,
-  "AssemblyName": "Exund.ModOptionsTab.dll",
-  "EntryMethod": "Exund.ModOptionsTab.ModOptionsTabMod.Load"
-}

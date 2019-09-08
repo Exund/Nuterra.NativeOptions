@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
-namespace Exund.ModOptionsTab
+namespace Nuterra.NativeOptions
 {
 	public class OptionText : Option<string>
 	{

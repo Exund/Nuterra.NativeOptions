@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Exund.ModOptionsTab
+namespace Nuterra.NativeOptions
 {
 	public class UIElements
 	{
@@ -28,6 +28,7 @@ namespace Exund.ModOptionsTab
 		public static readonly Sprite UIMask = Sprites.First(f => f.name == "UIMask");
 		public static readonly Sprite Profile_ArrowDown = Sprites.First(f => f.name == "Profile_ArrowDown");
 		public static readonly Sprite ScrollBar_Small_01 = Sprites.First(f => f.name == "ScrollBar_Small_01");
+		public static readonly Sprite Icon_BACK = Sprites.First(f => f.name == "Icon_BACK");
 
 		public static readonly GameObject[] GameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
 		public static readonly GameObject DropdownOption_Language = GameObjects.First(f => f.name == "DropdownOption_Language");
@@ -36,6 +37,8 @@ namespace Exund.ModOptionsTab
 		public static readonly GameObject KeybindingPrefab_TurnCamera = GameObjects.First(f => f.name == "KeybindingPrefab_TurnCamera");
 		public static readonly GameObject InputFieldOption_Prefab;
 		public static readonly GameObject OptionEntryPrefab;
+		public static readonly GameObject CategoryPrefab = GameObjects.First(f => f.name == "_EmptySpace_ (1)");
+		public static readonly GameObject Button_Back = GameObjects.First(f => f.name == "Button Back");
 
 		static UIElements()
 		{
@@ -141,6 +144,16 @@ namespace Exund.ModOptionsTab
 			OptionEntry_LabelShadow.effectDistance = new Vector2(1f, -1f);
 
 			return OptionEntry;
+		}
+
+		public static GameObject CreateCategoryEntry(string Title)
+		{
+			GameObject CategoryEntry = GameObject.Instantiate(CategoryPrefab);
+			CategoryEntry.SetActive(true);
+			CategoryEntry.GetComponentInChildren<Text>().text = Title;
+			GameObject.DestroyImmediate(CategoryEntry.GetComponentInChildren<UILocalisedText>());
+
+			return CategoryEntry;
 		}
 
 		public class AutoIncrement
