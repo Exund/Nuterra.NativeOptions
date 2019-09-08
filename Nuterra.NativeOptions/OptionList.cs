@@ -8,53 +8,8 @@ using UnityEngine.Events;
 
 namespace Nuterra.NativeOptions
 {
-	/*public class OptionList : Option<int>
-	{
-		Dropdown dropdown;
-		public OptionList(string Name, string ModName, List<string> Items, int DefaultValue = 0) : base(Name, ModName, DefaultValue)
-		{
-			UIElement = GameObject.Instantiate(UIElements.DropdownOption_Language);
-			UIElement.SetActive(true);
-			UIElement.name = $"DropdownOption_{ModName}-{Name}";
-			var text = UIElement.transform.Find("Text");
-			GameObject.DestroyImmediate(text.GetComponent<UILocalisedText>());
-			text.GetComponent<Text>().text = Name;
-			dropdown = UIElement.GetComponentInChildren<Dropdown>();
-			dropdown.ClearOptions();
-			dropdown.AddOptions(Items);
-			Value = DefaultValue;
-		}
-
-		public string Selected
-		{
-			get => dropdown.options[dropdown.value].text;
-		}
-
-		public override int Value
-		{
-			get => dropdown.value;
-			set
-			{
-				dropdown.value = value;
-				base.Value = dropdown.value;
-			}
-		}
-
-		public override UnityEventBase onValueChanged => dropdown.onValueChanged;
-
-		public override GameObject UIElement { get; protected set; }
-	}*/
-
 	public class OptionListEnum<T> : Option<T> where T : Enum, IConvertible
 	{
-		/*public OptionListEnum(string Name, string ModName) : base(Name, ModName, ((T[])Enum.GetValues(typeof(T))).ToList()) { }
-
-		public T Value {
-			get => (T)Enum.ToObject(typeof(T), base.Value);
-			set => base.Value = value.ToInt32(null);
-		}*/
-
-		
 		Dropdown dropdown;
 
 		public OptionListEnum(string Name, string ModName) : this(Name, ModName, (T)Enum.ToObject(typeof(T), 0)) { }

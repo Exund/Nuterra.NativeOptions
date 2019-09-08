@@ -15,13 +15,6 @@ namespace Nuterra.NativeOptions
 		{
 			var harmony = HarmonyInstance.Create("Nuterra.NativeOptions");
 			harmony.PatchAll(Assembly.GetExecutingAssembly());
-
-			/*new OptionToggle("Test Toggle", "a", true);
-			new OptionRange("Test Slider", "b", 5f, MaxValue:10f);
-			new OptionText("Test Input", "c", "Test", ContentType: InputField.ContentType.IntegerNumber);
-			new OptionList<string>("Test Dropdown", "d", new List<string> { "1", "2", "3", "4", "5", "6", "7" }, 2);
-			new OptionKey("Test Key", "e", KeyCode.B);
-			new OptionListEnum<UIInputMode>("Test Dropdown 2", "f", UIInputMode.ControlScheme);*/
 		}
 	}
 
@@ -273,9 +266,6 @@ namespace Nuterra.NativeOptions
 					if (set)
 					{
 						instance.ShowOptions((UIScreenOptions.OptionsType)(optionsCount - 1));
-						/*Console.WriteLine(UIUtilities.GetComponentTree(UIElements.Button_Back));
-						Console.WriteLine(UIUtilities.GetComponentTree(optionsElements[1].gameObject));
-						Console.WriteLine(UIUtilities.GetComponentTree(Mods));*/
 					}
 				});
 				((UIOptionsMods)optionsElements[optionsCount - 1]).tab_toggle = modsToggle;
@@ -478,93 +468,7 @@ namespace Nuterra.NativeOptions
 				content2Group.spacing = 2f;
 				content2Group.padding = new RectOffset(0, 0, 5, 0);
 				content2.transform.SetParent(mid_panel.transform, false);
-
 				
-				#region InputField
-				/*GameObject InputFieldOption_Test3 = UIElements.CreateOptionEntry("Test3", "InputFieldOption_Test3");
-
-				var InputFieldOption_Test3Rect = InputFieldOption_Test3.GetComponent<RectTransform>();
-				var InputFieldOption_Test3BehaviourInputField = InputFieldOption_Test3.AddComponent<UIOptionsBehaviourInputField>();
-
-				InputFieldOption_Test3.transform.SetParent(content1.transform, false);
-
-				var InputFieldOption_Test3_InputField = DefaultControls.CreateInputField(new DefaultControls.Resources()
-				{
-					inputField = UIElements.Options_Unticked
-				});
-				var InputFieldOption_Test3_InputFieldInputField = InputFieldOption_Test3_InputField.GetComponent<InputField>();
-				BehaviourInputField_m_Target.SetValue(InputFieldOption_Test3BehaviourInputField, InputFieldOption_Test3_InputFieldInputField);
-				InputFieldOption_Test3_InputFieldInputField.transition = Selectable.Transition.None;
-				InputFieldOption_Test3_InputFieldInputField.navigation = new Navigation()
-				{
-					mode = Navigation.Mode.None
-				};
-				var InputFieldOption_Test3_InputFieldRect = InputFieldOption_Test3_InputField.GetComponent<RectTransform>();
-				InputFieldOption_Test3_InputFieldRect.anchoredPosition3D = new Vector3(174f, 0, 0);
-				InputFieldOption_Test3_InputFieldRect.sizeDelta = new Vector2(202f, 30f);
-
-				var InputFieldOption_Test3_InputField_Placeholder = InputFieldOption_Test3_InputField.transform.Find("Placeholder").gameObject;
-				var InputFieldOption_Test3_InputField_PlaceholderRect = InputFieldOption_Test3_InputField_Placeholder.GetComponent<RectTransform>();
-				var InputFieldOption_Test3_InputField_PlaceholderText = InputFieldOption_Test3_InputField_Placeholder.GetComponent<Text>();
-				InputFieldOption_Test3_InputField_PlaceholderText.text = "";
-				InputFieldOption_Test3_InputField_PlaceholderText.alignment = TextAnchor.MiddleLeft;
-				InputFieldOption_Test3_InputField_PlaceholderText.font = UIElements.ExoRegular;
-				InputFieldOption_Test3_InputField_PlaceholderText.fontSize = 14;
-				InputFieldOption_Test3_InputField_PlaceholderText.fontStyle = FontStyle.Normal;
-				InputFieldOption_Test3_InputField_PlaceholderText.color = Color.white;
-				InputFieldOption_Test3_InputField_PlaceholderText.lineSpacing = 1;
-
-				var InputFieldOption_Test3_InputField_Text = InputFieldOption_Test3_InputField.transform.Find("Text").gameObject;
-				var InputFieldOption_Test3_InputField_TextRect = InputFieldOption_Test3_InputField_Text.GetComponent<RectTransform>();
-				var InputFieldOption_Test3_InputField_TextText = InputFieldOption_Test3_InputField_Text.GetComponent<Text>();
-				InputFieldOption_Test3_InputField_TextText.text = "";
-				InputFieldOption_Test3_InputField_TextText.alignment = TextAnchor.MiddleLeft;
-				InputFieldOption_Test3_InputField_TextText.font = UIElements.ExoRegular;
-				InputFieldOption_Test3_InputField_TextText.fontSize = 14;
-				InputFieldOption_Test3_InputField_TextText.fontStyle = FontStyle.Normal;
-				InputFieldOption_Test3_InputField_TextText.color = Color.white;
-				InputFieldOption_Test3_InputField_TextText.lineSpacing = 1;
-
-				InputFieldOption_Test3_InputField.transform.SetParent(InputFieldOption_Test3.transform, false);*/
-				#endregion InputField
-
-				#region Dropdown Copy
-				/*var DropdownOption_Test4 = GameObject.Instantiate(UIElements.DropdownOption_Language);
-				DropdownOption_Test4.name = "DropdownOption_Test4";
-				DropdownOption_Test4.SetActive(true);
-				GameObject.DestroyImmediate(DropdownOption_Test4.GetComponent<UINavigationEntryPoint>());
-				var DropdownOption_Test4_Text = DropdownOption_Test4.transform.Find("Text").gameObject;
-				DropdownOption_Test4_Text.GetComponent<Text>().text = "Test4";
-				GameObject.DestroyImmediate(DropdownOption_Test4_Text.GetComponent<UILocalisedText>());
-				var DropdownOption_Test4_DropdownDropdown = DropdownOption_Test4.GetComponentInChildren<Dropdown>();
-				DropdownOption_Test4_DropdownDropdown.ClearOptions();
-				DropdownOption_Test4_DropdownDropdown.AddOptions(new List<string>() { "1", "2", "3", "4", "5", "6", "7" });
-				DropdownOption_Test4_DropdownDropdown.RefreshShownValue();	
-				DropdownOption_Test4.transform.SetParent(content2.transform, false);*/
-				#endregion Dropdown Copy
-
-				#region Toggle Copy
-				/*var ToggleOption_Test5 = GameObject.Instantiate(UIElements.CheckboxOption_PauseOnFocusLost);
-				ToggleOption_Test5.name = "ToggleOption_Test5";
-				ToggleOption_Test5.SetActive(true);
-				var ToggleOption_Test5_Text = ToggleOption_Test5.transform.Find("Text").gameObject;
-				ToggleOption_Test5_Text.GetComponent<Text>().text = "Test5";
-				GameObject.DestroyImmediate(ToggleOption_Test5_Text.GetComponent<UILocalisedText>());
-				var ToggleOption_Test5_TickBoxToggle = ToggleOption_Test5.GetComponentInChildren<Toggle>();
-				ToggleOption_Test5.transform.SetParent(content1.transform, false);*/
-				#endregion Toggle Copy
-
-				#region Slider Copy
-				/*var SliderOption_Test6 = GameObject.Instantiate(UIElements.SliderOption_HorizontalSensivity);
-				SliderOption_Test6.name = "SliderOption_Test6";
-				SliderOption_Test6.SetActive(true);
-				var SliderOption_Test6_Text = SliderOption_Test6.transform.Find("Text").gameObject;
-				SliderOption_Test6_Text.GetComponent<Text>().text = "Test6";
-				GameObject.DestroyImmediate(SliderOption_Test6_Text.GetComponent<UILocalisedText>());
-				var SliderOption_Test6_SliderSlider = SliderOption_Test6.GetComponentInChildren<Slider>();
-				SliderOption_Test6.transform.SetParent(content2.transform, false);*/
-				#endregion Slider Copy
-
 				UIOptionsMods.MidPanel = mid_panel;
 				UIOptionsMods.Content1 = content1;
 				UIOptionsMods.Content2 = content2;
