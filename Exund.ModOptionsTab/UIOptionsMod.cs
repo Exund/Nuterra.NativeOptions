@@ -130,40 +130,97 @@ namespace Nuterra.NativeOptions
 					without compression : 10
 					with compression : 16
 				*/
-				/*for (var i = 0; i < m_Options.Count; i++)
-				{
-					var option = m_Options[i];
-					option.UIElement.transform.SetParent((i > m_Options.Count/2f ? Content2 : Content1).transform, false);
-					////Console.WriteLine($"{option.modName}-{option.name} UI added");
-				}*/
 
-
-
-				
+				Column ccolumn = new Column();
+				ccolumn.modOptions = new List<ModOptions>();
 
 				Page cpage = new Page()
 				{
-					column1 = new Column()
-					{
-						modOptions = new List<ModOptions>()
-					},
+					column1 = ccolumn,
 					column2 = new Column()
 					{
 						modOptions = new List<ModOptions>()
 					}
 				};
-				Column ccolumn = new Column();
-				ccolumn.modOptions = new List<ModOptions>();
 
 				try
 				{
+					var i = 0;
+					var ci = 0;
+					var pi = 0;
 					foreach (var group in m_Options.GroupBy(o => o.modName))
 					{
 						ModOptions mo = new ModOptions();
 						mo.options = group.ToList();
 
-						if (mo.options.Count >= 16 && mo.options.Count <= 32)
+						if (mo.options.Count <= 16)
 						{
+							if (ci % 2 == 0)
+							{
+								if (ccolumn.modOptions.Sum(m => m.options.Count + 1) + mo.options.Count < 10)
+								{
+									ccolumn.modOptions.Add(mo);
+								}
+								else
+								{
+									ci++;
+									ccolumn = new Column()
+									{
+										modOptions = new List<ModOptions>() { mo }
+									};
+									cpage.column2 = ccolumn;
+								}
+							}
+							else
+							{
+								if (ccolumn.modOptions.Sum(m => m.options.Count + 1) + mo.options.Count < 10)
+								{
+									ccolumn.modOptions.Add(mo);
+								}
+								else
+								{
+									pages.Add(cpage);
+									ci++;
+									ccolumn = new Column()
+									{
+										modOptions = new List<ModOptions>() { mo }
+									};
+									pi++;
+									cpage = new Page()
+									{
+										column1 = ccolumn,
+										column2 = new Column()
+										{
+											modOptions = new List<ModOptions>()
+										}
+									};
+									cpage.column1 = ccolumn;
+								}
+							}
+						}
+						i++;
+
+						Console.WriteLine($"group {group.Key}, i {i}, page {pi}, column {ci}");
+
+						{/* if (mo.options.Count >= 16 && mo.options.Count <= 32)
+						{
+							if (cpage.column1.modOptions.Count == 0) cpage.column1 = ccolumn;
+							else if (cpage.column2.modOptions.Count == 0) cpage.column2 = ccolumn;
+							else
+							{
+								pages.Add(cpage);
+								cpage = new Page()
+								{
+									column1 = new Column()
+									{
+										modOptions = new List<ModOptions>()
+									},
+									column2 = new Column()
+									{
+										modOptions = new List<ModOptions>()
+									}
+								};
+							}
 							Console.WriteLine($"Multi column group {group.Key}");
 							if (cpage.column1.modOptions.Count == 0) cpage.column1 = ccolumn;
 							else if (cpage.column2.modOptions.Count == 0) cpage.column2 = ccolumn;
@@ -184,7 +241,18 @@ namespace Nuterra.NativeOptions
 							}
 							while (mo.options.Count > 0)
 							{
-								Console.WriteLine($"{group.Key} {mo.options.Count}");
+								ccolumn = new Column();
+								ccolumn.modOptions = new List<ModOptions>()
+								{
+									new ModOptions()
+									{
+										options = mo.options.GetRange(0, Math.Min(16, mo.options.Count))
+									}
+								};
+
+								mo.options.RemoveRange(0, Math.Min(16, mo.options.Count));
+
+
 								if (cpage.column1.modOptions.Count == 0) cpage.column1 = ccolumn;
 								else if (cpage.column2.modOptions.Count == 0) cpage.column2 = ccolumn;
 								else
@@ -202,17 +270,6 @@ namespace Nuterra.NativeOptions
 										}
 									};
 								}
-
-								ccolumn = new Column();
-								ccolumn.modOptions = new List<ModOptions>()
-								{
-									new ModOptions()
-									{
-										options = mo.options.GetRange(0, Math.Min(16, mo.options.Count))
-									}
-								};
-
-								mo.options.RemoveRange(0, Math.Min(16, mo.options.Count));
 							}
 						}
 						else
@@ -240,11 +297,11 @@ namespace Nuterra.NativeOptions
 								ccolumn.modOptions = new List<ModOptions>();
 							}
 							ccolumn.modOptions.Add(mo);
-						}
+						} */}
 					}
-					if (cpage.column1.modOptions.Count == 0) cpage.column1 = ccolumn;
+					/*if (cpage.column1.modOptions.Count == 0) cpage.column1 = ccolumn;
 					else if (cpage.column2.modOptions.Count == 0) cpage.column2 = ccolumn;
-					pages.Add(cpage);
+					pages.Add(cpage);*/
 				}
 				catch (Exception e)
 				{

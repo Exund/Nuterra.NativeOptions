@@ -23,7 +23,7 @@ namespace Nuterra.NativeOptions
 			new OptionKey("Test Key", "e", KeyCode.B);
 			new OptionListEnum<UIInputMode>("Test Dropdown 2", "f", UIInputMode.ControlScheme);
 
-			for (int i = 0; i < 22; i++)
+			/*for (int i = 0; i < 22; i++)
 			{
 				new OptionToggle("Test Toggle" + i, "g", true);
 			}
@@ -41,6 +41,11 @@ namespace Nuterra.NativeOptions
 			for (int i = 0; i < 32; i++)
 			{
 				new OptionToggle("Test Toggle" + i, "j", true);
+			}*/
+
+			for (int i = 0; i < 32; i++)
+			{
+				new OptionToggle("Test Toggle", Math.Floor(i/4f) + "", true);
 			}
 		}
 	}
