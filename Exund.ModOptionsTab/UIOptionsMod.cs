@@ -124,14 +124,6 @@ namespace Nuterra.NativeOptions
 
 				m_Options = m_Options.OrderBy(o => o.modName).ToList();
 
-
-				/*
-				Entries per side :
-					without compression : 10
-					with compression : 16
-				*/
-
-
 				try
 				{
 					var columns = new List<Column>();
@@ -160,7 +152,7 @@ namespace Nuterra.NativeOptions
 									}
 								};
 								ccc.entries.AddRange(opts.Select(o => new Entry("", o)));
-								columns.Add(ccc);	
+								columns.Add(ccc);
 							}
 						}
 						else if (num < 17)
@@ -169,12 +161,13 @@ namespace Nuterra.NativeOptions
 							var ccc = new Column()
 							{
 								entries = new List<Entry>()
-									{
-										new Entry(group.Key)
-									}
+								{
+									new Entry(group.Key)
+								}
 							};
 							ccc.entries.AddRange(opts.Select(o => new Entry("", o)));
-							columns.Add(ccc);
+							if (columns[0].entries.Count != 0) columns.Add(ccc);
+							else columns[0] = ccc;
 						}
 						else
 						{
@@ -190,11 +183,13 @@ namespace Nuterra.NativeOptions
 									}
 								};
 								ccc.entries.AddRange(ii.GetRange(0, Math.Min(16, ii.Count)).Select(o => new Entry("", o)));
-								columns.Add(ccc);
+								if (columns[0].entries.Count != 0) columns.Add(ccc);
+								else columns[0] = ccc;
 
 								ii.RemoveRange(0, Math.Min(16, ii.Count));
 							}
 						}
+						Console.WriteLine(columns.Select(c => c.entries.Count).ToArray());
 					}
 
 					pages = new List<Page>();
@@ -204,25 +199,11 @@ namespace Nuterra.NativeOptions
 						if (i % 2 == 0) pi++;
 						if (pages.Count == pi) pages.Add(new Page() { columns = new List<Column>() });
 						pages[pi].columns.Add(columns[i]);
-
-						Console.WriteLine($"Page {pi}");
-						foreach (var e in columns[i].entries)
-						{
-							Console.Write($"Column {i} ");
-							if(e.title != "")
-							{
-								Console.WriteLine("title " + e.title);
-							}
-							else
-							{
-								Console.WriteLine("name " +e.option.name);
-							}
-						}
 					}
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine("Separation");
+					Console.WriteLine("Pagination");
 					Console.WriteLine(e.ToString());
 				}
 
@@ -261,12 +242,12 @@ namespace Nuterra.NativeOptions
 			
 			try
 			{
-				MidPanel.transform.parent.Find("Top Panel/Category 1/Title").GetComponent<Text>().text = pages[page_index].columns[0].entries[0].title;
+				MidPanel.transform.parent.Find("Top Panel/Category 1/Title").GetComponent<Text>().text = pages[page_index].columns[0].entries[0].title.ToUpper();
 				foreach (var entry in pages[page_index].columns[0].entries)
 				{
 					if (entry.title != "" && entry.title != pages[page_index].columns[0].entries[0].title)
 					{
-						UIElements.CreateCategoryEntry(entry.title).transform.SetParent(Content1.transform, false);
+						UIElements.CreateCategoryEntry(entry.title.ToUpper()).transform.SetParent(Content1.transform, false);
 					}
 					else if(entry.option != null)
 					{
@@ -276,12 +257,12 @@ namespace Nuterra.NativeOptions
 
 				if (pages[page_index].columns.Count > 1)
 				{
-					MidPanel.transform.parent.Find("Top Panel/Category 2/Title").GetComponent<Text>().text = pages[page_index].columns[1].entries[0].title;
+					MidPanel.transform.parent.Find("Top Panel/Category 2/Title").GetComponent<Text>().text = pages[page_index].columns[1].entries[0].title.ToUpper();
 					foreach (var entry in pages[page_index].columns[1].entries)
 					{
 						if (entry.title != "" && entry.title != pages[page_index].columns[1].entries[0].title)
 						{
-							UIElements.CreateCategoryEntry(entry.title).transform.SetParent(Content2.transform, false);
+							UIElements.CreateCategoryEntry(entry.title.ToUpper()).transform.SetParent(Content2.transform, false);
 						}
 						else if (entry.option != null)
 						{
@@ -324,22 +305,6 @@ namespace Nuterra.NativeOptions
 			var text = PageInfo.GetComponent<Text>();
 			text.text = $"Page {page_index + 1}/{pages.Count}";
 		}
-
-		/*struct ModOptions
-		{
-			public List<Option> options;
-		}
-
-		struct Column
-		{
-			public List<ModOptions> modOptions;
-		}
-
-		struct Page
-		{
-			public Column column1;
-			public Column column2;
-		}*/
 
 		struct Entry
 		{

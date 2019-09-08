@@ -110,7 +110,6 @@ namespace Nuterra.NativeOptions
 			/*var KeybindButton2 = KeybindingPrefab_TurnCamera.transform.Find("Buttons Panel/Button (2)").gameObject;
 			KeybindButton2.SetActive(true);
 			KeybindButton2.GetComponent<Button>().interactable = true;*/
-
 		}
 
 		public static GameObject CreateOptionEntry(string Title, string Name)
@@ -166,7 +165,6 @@ namespace Nuterra.NativeOptions
 			{
 				value = Start;
 			}
-
 			public int Value
 			{
 				get
