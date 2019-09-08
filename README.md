@@ -62,9 +62,9 @@ OptionList<int> option = new OptionList<string>(
 ### Enum List
 A dropdown that has an Enum value
 ```csharp
-OptionListEnum<ChunkRarity> = new OptionListEnum<ChunkRarity>("Option name", "Mod name");
+OptionListEnum<ChunkRarity> option = new OptionListEnum<ChunkRarity>("Option name", "Mod name");
 // Setting default value
-OptionListEnum<ChunkRarity> = new OptionListEnum<ChunkRarity>("Option name", "Mod name", ChunkRarity.Common);
+OptionListEnum<ChunkRarity> option = new OptionListEnum<ChunkRarity>("Option name", "Mod name", ChunkRarity.Common);
 ```
 
 # Saved value
