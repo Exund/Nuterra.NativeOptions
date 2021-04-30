@@ -18,16 +18,27 @@ namespace Nuterra.NativeOptions
 		
 		public OptionKey(string Name, string ModName, KeyCode DefaultValue) : base(Name, ModName, DefaultValue)
 		{
-			UIElement = GameObject.Instantiate(UIElements.KeybindingPrefab_TurnCamera);
+			UIElement = GameObject.Instantiate(UIElements.KeyOption_Prefab);
 			UIElement.SetActive(true);
 			UIElement.name = $"KeybindingOption_{ModName}-{Name}";
-			var text = UIElement.transform.Find("Text");
-			text.GetComponent<Text>().text = Name;
 			
 
-			var KeybindButton1 = UIElement.transform.Find("Buttons Panel/Button").gameObject;
-			Button1 = KeybindButton1.GetComponent<Button>();
-			Text1 = KeybindButton1.GetComponentInChildren<Text>();
+			if (UIElements.Pre1481)
+			{
+				var KeybindButton = UIElement.transform.Find("Buttons Panel/Button").gameObject;
+				Button1 = KeybindButton.GetComponent<Button>();
+				Text1 = KeybindButton.GetComponentInChildren<Text>();
+				var text = UIElement.transform.Find("Text");
+				text.GetComponent<Text>().text = Name;
+			} 
+			else
+            {
+				var row = UIElement.transform;//.Find("FirstRow (1)");
+				var KeybindButton = row.Find("ButtonPos2");
+				Button1 = KeybindButton.GetComponent<Button>();
+				Text1 = KeybindButton.GetComponentInChildren<Text>();
+				row.Find("AxisName").GetComponent<Text>().text = Name;
+			}
 
 			Button1.onClick.AddListener(() =>
 			{

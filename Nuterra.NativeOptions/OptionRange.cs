@@ -15,12 +15,12 @@ namespace Nuterra.NativeOptions
 		public OptionRange(string Name, string ModName, float DefaultValue = 0f, float MinValue = 0f, float MaxValue = 100f, float RoundTo = 1f) : base(Name, ModName, DefaultValue)
 		{
 			roundTo = RoundTo;
-			UIElement = GameObject.Instantiate(UIElements.SliderOption_HorizontalSensivity);
+			UIElement = GameObject.Instantiate(UIElements.SliderOption_Prefab);
 			UIElement.SetActive(true);
 			UIElement.name = $"SliderOption_{ModName}-{Name}";
 			var text = UIElement.transform.Find("Text");
-			GameObject.DestroyImmediate(text.GetComponent<UILocalisedText>());
-			text.GetComponent<Text>().text = Name;			
+			//GameObject.DestroyImmediate(text.GetComponent<UILocalisedText>());
+			text.GetComponent<Text>().text = Name;
 			slider = UIElement.GetComponentInChildren<Slider>();
 			slider.minValue = MinValue;
 			slider.maxValue = MaxValue;

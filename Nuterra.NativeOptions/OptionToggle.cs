@@ -12,11 +12,11 @@ namespace Nuterra.NativeOptions
 	{
 		private Toggle toggle;
 		public OptionToggle(string Name, string ModName, bool DefaultValue = false) : base(Name, ModName, DefaultValue) {
-			UIElement = GameObject.Instantiate(UIElements.CheckboxOption_PauseOnFocusLost);
+			UIElement = GameObject.Instantiate(UIElements.CheckboxOption_Prefab);
 			UIElement.SetActive(true);
 			UIElement.name = $"CheckboxOption_{ModName}-{Name}";
 			var text = UIElement.transform.Find("Text");
-			GameObject.DestroyImmediate(text.GetComponent<UILocalisedText>());
+			//GameObject.DestroyImmediate(text.GetComponent<UILocalisedText>());
 			text.GetComponent<Text>().text = Name;
 			toggle = UIElement.GetComponentInChildren<Toggle>();
 			Value = DefaultValue;

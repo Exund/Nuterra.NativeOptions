@@ -15,14 +15,14 @@ namespace Nuterra.NativeOptions
 		public OptionListEnum(string Name, string ModName) : this(Name, ModName, (T)Enum.ToObject(typeof(T), 0)) { }
 		public OptionListEnum(string Name, string ModName, T DefaultValue) : base(Name, ModName, DefaultValue)
 		{
-			UIElement = GameObject.Instantiate(UIElements.DropdownOption_Language);
+			UIElement = GameObject.Instantiate(UIElements.DropdownOption_Prefab);
 			UIElement.SetActive(true);
 			UIElement.name = $"DropdownOption_{ModName}-{Name}";
 			var text = UIElement.transform.Find("Text");
-			GameObject.DestroyImmediate(text.GetComponent<UILocalisedText>());
+			//GameObject.DestroyImmediate(text.GetComponent<UILocalisedText>());
 			text.GetComponent<Text>().text = Name;
 			dropdown = UIElement.GetComponentInChildren<Dropdown>();
-			dropdown.ClearOptions();
+			//dropdown.ClearOptions();
 			dropdown.AddOptions(Enum.GetNames(typeof(T)).ToList());
 			Value = DefaultValue;
 
@@ -54,14 +54,14 @@ namespace Nuterra.NativeOptions
 		Dropdown dropdown;
 		public OptionList(string Name, string ModName, List<T> Items, int DefaultValue = 0) : base(Name, ModName, DefaultValue)
 		{
-			UIElement = GameObject.Instantiate(UIElements.DropdownOption_Language);
+			UIElement = GameObject.Instantiate(UIElements.DropdownOption_Prefab);
 			UIElement.SetActive(true);
 			UIElement.name = $"DropdownOption_{ModName}-{Name}";
 			var text = UIElement.transform.Find("Text");
-			GameObject.DestroyImmediate(text.GetComponent<UILocalisedText>());
+			//GameObject.DestroyImmediate(text.GetComponent<UILocalisedText>());
 			text.GetComponent<Text>().text = Name;
 			dropdown = UIElement.GetComponentInChildren<Dropdown>();
-			dropdown.ClearOptions();
+			//dropdown.ClearOptions();
 			dropdown.AddOptions(Items.Select(i => i.ToString()).ToList());
 			items = Items;
 			Value = DefaultValue;

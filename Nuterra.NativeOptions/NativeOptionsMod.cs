@@ -71,6 +71,35 @@ namespace Nuterra.NativeOptions
 						tree.AppendFormat("\n{0}\t\t\tstartAxis {1}", tab, glg.startAxis.ToString());
 						tree.AppendFormat("\n{0}\t\t\tstartCorner {1}", tab, glg.startCorner.ToString());
 					}
+					if (item is LayoutElement le)
+					{
+						tree.AppendFormat("\n{0}\t\t\tminWidth {1}", tab, le.minWidth);
+						tree.AppendFormat("\n{0}\t\t\tminHeight {1}", tab, le.minHeight);
+						tree.AppendFormat("\n{0}\t\t\tpreferredWidth {1}", tab, le.preferredWidth);
+						tree.AppendFormat("\n{0}\t\t\tpreferredHeight {1}", tab, le.preferredHeight);
+						tree.AppendFormat("\n{0}\t\t\tflexibleWidth {1}", tab, le.flexibleWidth);
+						tree.AppendFormat("\n{0}\t\t\tflexibleHeight {1}", tab, le.flexibleHeight);
+					}
+					if (item is ScrollRect sr)
+					{
+						tree.AppendFormat("\n{0}\t\t\tdecelerationRate {1}", tab, sr.decelerationRate);
+						tree.AppendFormat("\n{0}\t\t\telasticity {1}", tab, sr.elasticity);
+						tree.AppendFormat("\n{0}\t\t\tinertia {1}", tab, sr.inertia);
+						tree.AppendFormat("\n{0}\t\t\tscrollSensitivity {1}", tab, sr.scrollSensitivity);
+						tree.AppendFormat("\n{0}\t\t\tvelocity ({1}, {2})", tab, sr.velocity.x, sr.velocity.y);
+						tree.AppendFormat("\n{0}\t\t\tmovementType {1}", tab, sr.movementType.ToString());
+						tree.AppendFormat("\n{0}\t\t\thorizontal {1}", tab, sr.horizontal);
+						tree.AppendFormat("\n{0}\t\t\thorizontalScrollbarSpacing {1}", tab, sr.horizontalScrollbarSpacing);
+						tree.AppendFormat("\n{0}\t\t\thorizontalScrollbarVisibility {1}", tab, sr.horizontalScrollbarVisibility.ToString());
+						tree.AppendFormat("\n{0}\t\t\tvertical {1}", tab, sr.vertical);
+						tree.AppendFormat("\n{0}\t\t\tverticalScrollbarSpacing {1}", tab, sr.verticalScrollbarSpacing);
+						tree.AppendFormat("\n{0}\t\t\tverticalScrollbarVisibility {1}", tab, sr.verticalScrollbarVisibility.ToString());
+					}
+					if(item is ContentSizeFitter csf)
+					{
+						tree.AppendFormat("\n{0}\t\t\thorizontalFit {1}", tab, csf.horizontalFit.ToString());
+						tree.AppendFormat("\n{0}\t\t\tverticalFit {1}", tab, csf.verticalFit.ToString());
+					}
 					if (item is Text t)
 					{
 						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "text", t.text);
@@ -151,12 +180,12 @@ namespace Nuterra.NativeOptions
 
 	static class Patches
 	{
-		static FieldInfo m_OptionsTypeCount;
-		static FieldInfo m_OptionsTabs;
-		static FieldInfo m_OptionsElements;
-		static FieldInfo BehaviourSlider_m_FSM;
-		static MethodInfo BehaviourSlider_OnPool;
-		static FieldInfo BehaviourDropdown_m_Target;
+		private static readonly FieldInfo m_OptionsTypeCount;
+		private static readonly FieldInfo m_OptionsTabs;
+		private static readonly FieldInfo m_OptionsElements;
+		private static readonly FieldInfo BehaviourSlider_m_FSM;
+        private static readonly MethodInfo BehaviourSlider_OnPool;
+        private static readonly FieldInfo BehaviourDropdown_m_Target;
 
 		static Patches()
 		{
@@ -244,6 +273,8 @@ namespace Nuterra.NativeOptions
 				((UIOptions[])m_OptionsElements.GetValue(__instance)).CopyTo(optionsElements, 0);
 
 
+				//Console.WriteLine(UIUtilities.GetComponentTree(optionsElements[1].gameObject));
+
 				// Give new tab a UIOptions panel and position to reference
 				DefaultControls.Resources resources = default(DefaultControls.Resources);
 				GameObject Mods = DefaultControls.CreatePanel(resources);
@@ -278,7 +309,7 @@ namespace Nuterra.NativeOptions
 				bottomRect.anchoredPosition3D = new Vector3(0, -289.6f, 0);
 				bottomRect.anchorMin = Vector2.zero;
 				bottomRect.anchorMax = Vector2.one;
-				bottomRect.pivot = Vector2.one / 2;
+				bottomRect.pivot = Vector2.one * 0.5f;
 				bottomRect.sizeDelta = new Vector2(-60f, -579.2f);
 				var bottomGroup = bottom_panel.AddComponent<GridLayoutGroup>();
 				bottomGroup.childAlignment = TextAnchor.MiddleLeft;
@@ -299,9 +330,10 @@ namespace Nuterra.NativeOptions
 				page_infoRect.anchorMax = Vector2.up;
 				page_infoRect.offsetMin = new Vector2(0, -45.3f);
 				page_infoRect.offsetMax = new Vector2(536f, -5.3f);
-				page_infoRect.pivot = Vector2.one / 2;
+				page_infoRect.pivot = Vector2.one * 0.5f;
 				//page_infoRect.sizeDelta(536.0, 40.0)
 				Text text = page_info.GetComponent<Text>();
+				text.text = "";
 				text.font = UIElements.ExoSemiBold;
 				text.fontSize = 25;
 				text.color = Color.white;
@@ -312,10 +344,10 @@ namespace Nuterra.NativeOptions
 				buttons_panel.name = "Page Panel";
 				GameObject.DestroyImmediate(buttons_panel.GetComponent<Image>());
 				var button_group = buttons_panel.AddComponent<HorizontalLayoutGroup>();
-				button_group.childAlignment = TextAnchor.MiddleCenter;
-				button_group.childControlWidth = true;
+				button_group.childAlignment = TextAnchor.MiddleRight;
+				button_group.childControlWidth = false;
 				button_group.childControlHeight = true;
-				button_group.childForceExpandWidth = true;
+				button_group.childForceExpandWidth = false;
 				button_group.childForceExpandHeight = true;
 				button_group.spacing = 0;
 				button_group.padding = new RectOffset(0, 0, 0, 0);
@@ -341,7 +373,8 @@ namespace Nuterra.NativeOptions
 				var nextState = next_page.GetComponent<Button>().spriteState;
 				nextState.disabledSprite = UIElements.Button_Disabled_BG;
 				next_page.GetComponent<Button>().spriteState = nextState;
-				next_page.transform.Find("Icon").GetComponent<RectTransform>().localEulerAngles = new Vector3(0, 180f, 0);
+				var next_iconRect = next_page.transform.Find("Icon").GetComponent<RectTransform>();
+				next_iconRect.localEulerAngles = new Vector3(0, 180f, 0);
 				next_page.transform.SetParent(buttons_panel.transform, false);
 
 				UIOptionsMods.PageInfo = page_info;
@@ -356,7 +389,7 @@ namespace Nuterra.NativeOptions
 				topRect.anchoredPosition3D = new Vector3(0, 285f, 0);
 				topRect.anchorMin = Vector2.zero;
 				topRect.anchorMax = Vector2.one;
-				topRect.pivot = Vector2.one / 2;
+				topRect.pivot = Vector2.one * 0.5f;
 				topRect.sizeDelta = new Vector2(-6.3f, -569.0f);
 				var group = top_panel.AddComponent<HorizontalLayoutGroup>();
 				group.childAlignment = TextAnchor.MiddleCenter;
@@ -384,7 +417,7 @@ namespace Nuterra.NativeOptions
 				title1.color = Color.white;
 				var title1Rect = category1_title.GetComponent<RectTransform>();
 				title1Rect.anchoredPosition3D = new Vector3(0, -2.1f, 0);
-				title1Rect.pivot = title1Rect.anchorMin = title1Rect.anchorMax = Vector2.one / 2;
+				title1Rect.pivot = title1Rect.anchorMin = title1Rect.anchorMax = Vector2.one * 0.5f;
 				title1Rect.sizeDelta = new Vector2(160f, 55.6f);
 				var title1Shadow = category1_title.AddComponent<Shadow>();
 				title1Shadow.effectColor = new Color(0, 0, 0, 0.5f);
@@ -406,7 +439,7 @@ namespace Nuterra.NativeOptions
 				title2.color = Color.white;
 				var title2Rect = category2_title.GetComponent<RectTransform>();
 				title2Rect.anchoredPosition3D = new Vector3(0, -2.1f, 0);
-				title2Rect.pivot = title2Rect.anchorMin = title2Rect.anchorMax = Vector2.one / 2;
+				title2Rect.pivot = title2Rect.anchorMin = title2Rect.anchorMax = Vector2.one * 0.5f;
 				title2Rect.sizeDelta = new Vector2(160f, 55.6f);
 				var title2Shadow = category2_title.AddComponent<Shadow>();
 				title2Shadow.effectColor = new Color(0, 0, 0, 0.5f);
@@ -426,7 +459,7 @@ namespace Nuterra.NativeOptions
 				midRect.anchorMax = Vector2.one;
 				midRect.offsetMin = new Vector2(3.2f, 50.7f);
 				midRect.offsetMax = new Vector2(-3.2f, -59.0f);
-				midRect.pivot = Vector2.one / 2;
+				midRect.pivot = Vector2.one * 0.5f;
 				var midGroup = mid_panel.AddComponent<HorizontalLayoutGroup>();
 				midGroup.childAlignment = TextAnchor.UpperLeft;
 				midGroup.childControlWidth = true;
