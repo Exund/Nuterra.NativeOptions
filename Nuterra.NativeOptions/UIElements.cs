@@ -165,7 +165,6 @@ namespace Nuterra.NativeOptions
             SliderOption_Prefab_TextText.fontSize = 14;
             SliderOption_Prefab_TextText.font = UIElements.ExoRegular;
             SliderOption_Prefab_TextText.enabled = true;
-            Console.WriteLine(UIUtilities.GetComponentTree(SliderOption_Prefab));
 
             DropdownOption_Prefab = GameObject.Instantiate(DropdownOption_Language);
             var DropdownOption_Prefab_Text = DropdownOption_Prefab.transform.Find("Text");

@@ -87,6 +87,8 @@ namespace Nuterra.NativeOptions
 				option.defaultValue = option.savedValue;
 				option.onValueSaved.Invoke();
 			}
+
+			NativeOptionsMod.onOptionsSaved.Invoke();
 		}
 
 		public override void Setup(EventNoParams OnChangeEvent)

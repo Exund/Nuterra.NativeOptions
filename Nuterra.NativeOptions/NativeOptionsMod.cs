@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using Harmony;
 
@@ -11,6 +12,8 @@ namespace Nuterra.NativeOptions
 {
 	public class NativeOptionsMod
 	{
+		public static UnityEvent onOptionsSaved = new UnityEvent();
+
 		public static void Load()
 		{
 			var harmony = HarmonyInstance.Create("Nuterra.NativeOptions");
