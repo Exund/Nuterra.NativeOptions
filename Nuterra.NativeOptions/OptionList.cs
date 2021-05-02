@@ -18,11 +18,8 @@ namespace Nuterra.NativeOptions
 			UIElement = GameObject.Instantiate(UIElements.DropdownOption_Prefab);
 			UIElement.SetActive(true);
 			UIElement.name = $"DropdownOption_{ModName}-{Name}";
-			var text = UIElement.transform.Find("Text");
-			//GameObject.DestroyImmediate(text.GetComponent<UILocalisedText>());
-			text.GetComponent<Text>().text = Name;
+			UIElement.transform.Find("Text").GetComponent<Text>().text = Name;
 			dropdown = UIElement.GetComponentInChildren<Dropdown>();
-			//dropdown.ClearOptions();
 			dropdown.AddOptions(Enum.GetNames(typeof(T)).ToList());
 			Value = DefaultValue;
 

@@ -154,7 +154,7 @@ namespace Nuterra.NativeOptions
 
                 CategoryPrefab = GameObject.Instantiate(GameObjects.First(f => f.name == "Heading_Movement"));
                 var catRect = CategoryPrefab.GetComponent<RectTransform>();
-                catRect.sizeDelta = new Vector2(590.9f, 50.0f);
+                catRect.sizeDelta = new Vector2(590f, 50f);
                 GameObject.DestroyImmediate(CategoryPrefab.GetComponentInChildren<UILocalisedText>());
             }
 
@@ -162,9 +162,11 @@ namespace Nuterra.NativeOptions
             var SliderOption_Prefab_Text = SliderOption_Prefab.transform.Find("Text");
             GameObject.DestroyImmediate(SliderOption_Prefab_Text.GetComponent<UILocalisedText>());
             var SliderOption_Prefab_TextText = SliderOption_Prefab_Text.GetComponent<Text>();
-            SliderOption_Prefab_TextText.fontSize = 14;
-            SliderOption_Prefab_TextText.font = UIElements.ExoRegular;
+            SliderOption_Prefab_TextText.fontSize = 15;
+            SliderOption_Prefab_TextText.font = UIElements.ExoSemiBold;
             SliderOption_Prefab_TextText.enabled = true;
+            SliderOption_Prefab_TextText.resizeTextMaxSize = 15;
+            SliderOption_Prefab_TextText.resizeTextMinSize = 1;
 
             DropdownOption_Prefab = GameObject.Instantiate(DropdownOption_Language);
             var DropdownOption_Prefab_Text = DropdownOption_Prefab.transform.Find("Text");

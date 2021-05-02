@@ -50,12 +50,6 @@ namespace Nuterra.NativeOptions
 						tree.AppendFormat("\n{0}\t\t\tchildAlignment {1}", tab, lg.childAlignment.ToString());
 						tree.AppendFormat("\n{0}\t\t\tlayoutPriority {1}", tab, lg.layoutPriority);
 						tree.AppendFormat("\n{0}\t\t\tpadding {1}", tab, lg.padding);
-						tree.AppendFormat("\n{0}\t\t\tminWidth {1}", tab, lg.minWidth);
-						tree.AppendFormat("\n{0}\t\t\tminHeight {1}", tab, lg.minHeight);
-						tree.AppendFormat("\n{0}\t\t\tpreferredWidth {1}", tab, lg.preferredWidth);
-						tree.AppendFormat("\n{0}\t\t\tpreferredHeight {1}", tab, lg.preferredHeight);
-						tree.AppendFormat("\n{0}\t\t\tflexibleWidth {1}", tab, lg.flexibleWidth);
-						tree.AppendFormat("\n{0}\t\t\tflexibleHeight {1}", tab, lg.flexibleHeight);
 					}
 					if (item is HorizontalOrVerticalLayoutGroup hvlg)
 					{	
@@ -73,15 +67,6 @@ namespace Nuterra.NativeOptions
 						tree.AppendFormat("\n{0}\t\t\tspacing {1}", tab, glg.spacing.ToString());
 						tree.AppendFormat("\n{0}\t\t\tstartAxis {1}", tab, glg.startAxis.ToString());
 						tree.AppendFormat("\n{0}\t\t\tstartCorner {1}", tab, glg.startCorner.ToString());
-					}
-					if (item is LayoutElement le)
-					{
-						tree.AppendFormat("\n{0}\t\t\tminWidth {1}", tab, le.minWidth);
-						tree.AppendFormat("\n{0}\t\t\tminHeight {1}", tab, le.minHeight);
-						tree.AppendFormat("\n{0}\t\t\tpreferredWidth {1}", tab, le.preferredWidth);
-						tree.AppendFormat("\n{0}\t\t\tpreferredHeight {1}", tab, le.preferredHeight);
-						tree.AppendFormat("\n{0}\t\t\tflexibleWidth {1}", tab, le.flexibleWidth);
-						tree.AppendFormat("\n{0}\t\t\tflexibleHeight {1}", tab, le.flexibleHeight);
 					}
 					if (item is ScrollRect sr)
 					{
@@ -112,6 +97,9 @@ namespace Nuterra.NativeOptions
 						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "fontStyle", t.fontStyle.ToString());
 						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "color", t.color.ToString());
 						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "lineSpacing", t.lineSpacing);
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "resizeTextForBestFit", t.resizeTextForBestFit);
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "resizeTextMaxSize", t.resizeTextMaxSize);
+						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "resizeTextMinSize", t.resizeTextMinSize);
 					}
 					if (item is Shadow s)
 					{
@@ -164,6 +152,15 @@ namespace Nuterra.NativeOptions
 							if(se.navigation.selectOnRight) tree.AppendFormat("\n{0}\t\t\t\t\t{1} {2}", tab, "selectOnRight", se.navigation.selectOnRight.name);
 						}
 
+					}
+					if (item is ILayoutElement le)
+					{
+						tree.AppendFormat("\n{0}\t\t\tminWidth {1}", tab, le.minWidth);
+						tree.AppendFormat("\n{0}\t\t\tminHeight {1}", tab, le.minHeight);
+						tree.AppendFormat("\n{0}\t\t\tpreferredWidth {1}", tab, le.preferredWidth);
+						tree.AppendFormat("\n{0}\t\t\tpreferredHeight {1}", tab, le.preferredHeight);
+						tree.AppendFormat("\n{0}\t\t\tflexibleWidth {1}", tab, le.flexibleWidth);
+						tree.AppendFormat("\n{0}\t\t\tflexibleHeight {1}", tab, le.flexibleHeight);
 					}
 					tree.AppendLine();
 				} catch { }
@@ -270,13 +267,9 @@ namespace Nuterra.NativeOptions
 					}
 				}
 
-
 				// Get the tab panels to an array
 				UIOptions[] optionsElements = new UIOptions[optionsCount];
 				((UIOptions[])m_OptionsElements.GetValue(__instance)).CopyTo(optionsElements, 0);
-
-
-				//Console.WriteLine(UIUtilities.GetComponentTree(optionsElements[1].gameObject));
 
 				// Give new tab a UIOptions panel and position to reference
 				DefaultControls.Resources resources = default(DefaultControls.Resources);

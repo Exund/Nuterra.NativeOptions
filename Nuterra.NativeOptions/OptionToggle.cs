@@ -15,9 +15,7 @@ namespace Nuterra.NativeOptions
 			UIElement = GameObject.Instantiate(UIElements.CheckboxOption_Prefab);
 			UIElement.SetActive(true);
 			UIElement.name = $"CheckboxOption_{ModName}-{Name}";
-			var text = UIElement.transform.Find("Text");
-			//GameObject.DestroyImmediate(text.GetComponent<UILocalisedText>());
-			text.GetComponent<Text>().text = Name;
+			UIElement.transform.Find("Text").GetComponent<Text>().text = Name;
 			toggle = UIElement.GetComponentInChildren<Toggle>();
 			Value = DefaultValue;
 

@@ -20,24 +20,21 @@ namespace Nuterra.NativeOptions
 		{
 			UIElement = GameObject.Instantiate(UIElements.KeyOption_Prefab);
 			UIElement.SetActive(true);
-			UIElement.name = $"KeybindingOption_{ModName}-{Name}";
-			
+			UIElement.name = $"KeybindingOption_{ModName}-{Name}";	
 
 			if (UIElements.Pre1481)
 			{
 				var KeybindButton = UIElement.transform.Find("Buttons Panel/Button").gameObject;
 				Button1 = KeybindButton.GetComponent<Button>();
 				Text1 = KeybindButton.GetComponentInChildren<Text>();
-				var text = UIElement.transform.Find("Text");
-				text.GetComponent<Text>().text = Name;
+				UIElement.transform.Find("Text").GetComponent<Text>().text = Name;
 			} 
 			else
             {
-				var row = UIElement.transform;//.Find("FirstRow (1)");
-				var KeybindButton = row.Find("ButtonPos2");
+				var KeybindButton = UIElement.transform.Find("ButtonPos2");
 				Button1 = KeybindButton.GetComponent<Button>();
 				Text1 = KeybindButton.GetComponentInChildren<Text>();
-				row.Find("AxisName").GetComponent<Text>().text = Name;
+				UIElement.transform.Find("AxisName").GetComponent<Text>().text = Name;
 			}
 
 			Button1.onClick.AddListener(() =>

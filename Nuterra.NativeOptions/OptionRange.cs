@@ -18,9 +18,7 @@ namespace Nuterra.NativeOptions
 			UIElement = GameObject.Instantiate(UIElements.SliderOption_Prefab);
 			UIElement.SetActive(true);
 			UIElement.name = $"SliderOption_{ModName}-{Name}";
-			var text = UIElement.transform.Find("Text");
-			//GameObject.DestroyImmediate(text.GetComponent<UILocalisedText>());
-			text.GetComponent<Text>().text = Name;
+			UIElement.transform.Find("Text").GetComponent<Text>().text = Name;
 			slider = UIElement.GetComponentInChildren<Slider>();
 			slider.minValue = MinValue;
 			slider.maxValue = MaxValue;

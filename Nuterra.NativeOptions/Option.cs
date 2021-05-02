@@ -37,7 +37,7 @@ namespace Nuterra.NativeOptions
 
 			UIOptionsMods.AddOption(this);
 
-			Console.WriteLine($"New Option {ModName}-{Name} of type {typeof(T).Name} registered");
+			Console.WriteLine($"[Nuterra.NativeOptions] Option {ModName}-{Name} of type {typeof(T).Name} registered");
 		}
 
 		public override void ResetValue()
