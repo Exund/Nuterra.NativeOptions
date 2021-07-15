@@ -6,7 +6,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using Harmony;
+using HarmonyLib;
 
 namespace Nuterra.NativeOptions
 {
@@ -16,7 +16,7 @@ namespace Nuterra.NativeOptions
 
 		public static void Load()
 		{
-			var harmony = HarmonyInstance.Create("Nuterra.NativeOptions");
+			var harmony = new Harmony("Nuterra.NativeOptions");
 			harmony.PatchAll(Assembly.GetExecutingAssembly());
 		}
 	}
