@@ -351,6 +351,9 @@ namespace Nuterra.NativeOptions
 
 				GameObject prev_page = GameObject.Instantiate(UIElements.Button_Back);
 				prev_page.SetActive(true);
+				GameObject.DestroyImmediate(prev_page.GetComponent<UIButtonGoToGauntletAttract>());
+				GameObject.DestroyImmediate(prev_page.GetComponent<UIButtonGoToScreen>());
+				GameObject.DestroyImmediate(prev_page.GetComponent<UIButtonGoToScreenOrCheckPremium>());
 				GameObject.DestroyImmediate(prev_page.GetComponent<UIButtonGoBack>());
 				var prevRect = prev_page.GetComponent<RectTransform>();
 				prevRect.anchoredPosition3D = Vector3.zero;
@@ -362,6 +365,9 @@ namespace Nuterra.NativeOptions
 
 				GameObject next_page = GameObject.Instantiate(UIElements.Button_Back);
 				next_page.SetActive(true);
+				GameObject.DestroyImmediate(next_page.GetComponent<UIButtonGoToGauntletAttract>());
+				GameObject.DestroyImmediate(next_page.GetComponent<UIButtonGoToScreen>());
+				GameObject.DestroyImmediate(next_page.GetComponent<UIButtonGoToScreenOrCheckPremium>());
 				GameObject.DestroyImmediate(next_page.GetComponent<UIButtonGoBack>());
 				var nextRect = next_page.GetComponent<RectTransform>();
 				nextRect.anchoredPosition3D = Vector3.zero;
@@ -376,7 +382,6 @@ namespace Nuterra.NativeOptions
 				UIOptionsMods.PageInfo = page_info;
 				UIOptionsMods.PrevPage = prev_page;
 				UIOptionsMods.NextPage = next_page;
-
 
 				GameObject top_panel = DefaultControls.CreatePanel(resources);
 				top_panel.name = "Top Panel";
