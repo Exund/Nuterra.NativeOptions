@@ -10,14 +10,26 @@ using HarmonyLib;
 
 namespace Nuterra.NativeOptions
 {
-	public class NativeOptionsMod
+	public class NativeOptionsMod : ModBase
 	{
 		public static UnityEvent onOptionsSaved = new UnityEvent();
+		private const string HarmonyID = "Nuterra.NativeOptions";
+		internal static Harmony harmony = new Harmony(HarmonyID);
+		internal static bool patched = false;
 
-		public static void Load()
+		public override void DeInit()
 		{
-			var harmony = new Harmony("Nuterra.NativeOptions");
-			harmony.PatchAll(Assembly.GetExecutingAssembly());
+			harmony.UnpatchAll(HarmonyID);
+			patched = false;
+		}
+
+		public override void Init()
+		{
+			if (!patched)
+			{
+				harmony.PatchAll(Assembly.GetExecutingAssembly());
+				patched = true;
+			}
 		}
 	}
 
@@ -190,7 +202,7 @@ namespace Nuterra.NativeOptions
 		static Patches()
 		{
 			Type UIScreenOptionsType = typeof(UIScreenOptions);
-			BindingFlags privateFlags = BindingFlags.Instance | BindingFlags.NonPublic;
+			BindingFlags privateFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
 			m_OptionsTypeCount = UIScreenOptionsType.GetField("m_OptionsTypeCount", privateFlags);
 			m_OptionsTabs = UIScreenOptionsType.GetField("m_OptionsTabs", privateFlags);
 			m_OptionsElements = UIScreenOptionsType.GetField("m_OptionsElements", privateFlags);	

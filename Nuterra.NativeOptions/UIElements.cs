@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,6 +34,9 @@ namespace Nuterra.NativeOptions
         public static readonly Sprite Button__BACK_Highlight_BG = Sprites.First(f => f.name == "Button__BACK_Highlight_BG");
         public static readonly Sprite Button_Disabled_BG = Sprites.First(f => f.name == "Button_Disabled_BG");
 
+        private static Dictionary<int, ComponentPool.Pool> PoolLookup = (Dictionary<int, ComponentPool.Pool>)typeof(ComponentPool).GetField("m_PoolLookup", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(Singleton.Manager<ComponentPool>.inst);
+
+        private static FieldInfo SliderSFM = typeof(UIOptionsBehaviourSlider).GetField("m_FSM", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         public static readonly GameObject[] GameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
         public static readonly GameObject DropdownOption_Language = GameObjects.First(f => f.name == "DropdownOption_Language");
         public static readonly GameObject CheckboxOption_PauseOnFocusLost = GameObjects.First(f => f.name == "CheckboxOption_PauseOnFocusLost");
@@ -49,10 +53,23 @@ namespace Nuterra.NativeOptions
         public static readonly GameObject CategoryPrefab;
         public static readonly GameObject Button_Back = GameObjects.First(f => f.name == "Button Back");
 
+        internal static bool Inited = false;
+
         public static readonly bool Pre1481 = new Version(SKU.DisplayVersion) < new Version("1.4.8.1");
 
         static UIElements()
         {
+            Inited = true;
+
+            NativeOptionsMod.harmony.PatchAll(Assembly.GetExecutingAssembly());
+            NativeOptionsMod.patched = true;
+
+            Console.WriteLine("[NativeOptions] - LISTING ALL GAMEOBJECTS");
+            foreach (GameObject go in GameObjects)
+            {
+                Console.WriteLine(go.name);
+            }
+
             OptionEntryPrefab = GameObject.Instantiate(CheckboxOption_PauseOnFocusLost);
             var EntryText = OptionEntryPrefab.transform.Find("Text").gameObject;
             EntryText.GetComponent<Text>().text = "Option Entry";
@@ -158,6 +175,7 @@ namespace Nuterra.NativeOptions
                 GameObject.DestroyImmediate(CategoryPrefab.GetComponentInChildren<UILocalisedText>());
             }
 
+            Console.WriteLine("About to instantiate Slider_HorizontalSensivity");
             SliderOption_Prefab = GameObject.Instantiate(SliderOption_HorizontalSensivity);
             var SliderOption_Prefab_Text = SliderOption_Prefab.transform.Find("Text");
             GameObject.DestroyImmediate(SliderOption_Prefab_Text.GetComponent<UILocalisedText>());
@@ -168,11 +186,13 @@ namespace Nuterra.NativeOptions
             SliderOption_Prefab_TextText.resizeTextMaxSize = 15;
             SliderOption_Prefab_TextText.resizeTextMinSize = 1;
 
+            Console.WriteLine("About to instantiate Dropdown");
             DropdownOption_Prefab = GameObject.Instantiate(DropdownOption_Language);
             var DropdownOption_Prefab_Text = DropdownOption_Prefab.transform.Find("Text");
             GameObject.DestroyImmediate(DropdownOption_Prefab_Text.GetComponent<UILocalisedText>());
             DropdownOption_Prefab.GetComponentInChildren<Dropdown>().ClearOptions();
 
+            Console.WriteLine("About to instantiate Checkbox");
             CheckboxOption_Prefab = GameObject.Instantiate(CheckboxOption_PauseOnFocusLost);
             var CheckboxOption_Prefab_Text = CheckboxOption_Prefab.transform.Find("Text");
             GameObject.DestroyImmediate(CheckboxOption_Prefab_Text.GetComponent<UILocalisedText>());
