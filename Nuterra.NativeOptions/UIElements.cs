@@ -18,20 +18,7 @@ namespace Nuterra.NativeOptions
         public static readonly Sprite Option_BG = Sprites.First(f => f.name == "Option_BG");
         public static readonly Sprite Option_Content_BG = Sprites.First(f => f.name == "Option_Content_BG");
         public static readonly Sprite Options_Unticked = Sprites.First(f => f.name == "Options_Unticked");
-        public static readonly Sprite Options_Ticked = Sprites.First(f => f.name == "Options_Ticked");
         public static readonly Sprite Option_Content_Highlight_BG = Sprites.First(f => f.name == "Option_Content_Highlight_BG");
-        public static readonly Sprite Slider_BG = Sprites.First(f => f.name == "Slider_BG");
-        public static readonly Sprite Slider_Fill_BG = Sprites.First(f => f.name == "Slider_Fill_BG");
-        public static readonly Sprite Knob = Sprites.First(f => f.name == "Knob");
-        public static readonly Sprite Dropdown_BG = Sprites.First(f => f.name == "Dropdown_BG");
-        public static readonly Sprite Dropdown_Active_BG = Sprites.First(f => f.name == "Dropdown_Active_BG");
-        public static readonly Sprite Dropdown_Highlight_BG = Sprites.First(f => f.name == "Dropdown_Highlight_BG");
-        public static readonly Sprite UIMask = Sprites.First(f => f.name == "UIMask");
-        public static readonly Sprite Profile_ArrowDown = Sprites.First(f => f.name == "Profile_ArrowDown");
-        public static readonly Sprite ScrollBar_Small_01 = Sprites.First(f => f.name == "ScrollBar_Small_01");
-        public static readonly Sprite Icon_BACK = Sprites.First(f => f.name == "Icon_BACK");
-        public static readonly Sprite Button_BACK = Sprites.First(f => f.name == "Button_BACK");
-        public static readonly Sprite Button__BACK_Highlight_BG = Sprites.First(f => f.name == "Button__BACK_Highlight_BG");
         public static readonly Sprite Button_Disabled_BG = Sprites.First(f => f.name == "Button_Disabled_BG");
 
         private static Dictionary<int, ComponentPool.Pool> PoolLookup = (Dictionary<int, ComponentPool.Pool>)typeof(ComponentPool).GetField("m_PoolLookup", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(Singleton.Manager<ComponentPool>.inst);
@@ -63,12 +50,6 @@ namespace Nuterra.NativeOptions
 
             NativeOptionsMod.harmony.PatchAll(Assembly.GetExecutingAssembly());
             NativeOptionsMod.patched = true;
-
-            Console.WriteLine("[NativeOptions] - LISTING ALL GAMEOBJECTS");
-            foreach (GameObject go in GameObjects)
-            {
-                Console.WriteLine(go.name);
-            }
 
             OptionEntryPrefab = GameObject.Instantiate(CheckboxOption_PauseOnFocusLost);
             var EntryText = OptionEntryPrefab.transform.Find("Text").gameObject;
@@ -175,7 +156,6 @@ namespace Nuterra.NativeOptions
                 GameObject.DestroyImmediate(CategoryPrefab.GetComponentInChildren<UILocalisedText>());
             }
 
-            Console.WriteLine("About to instantiate Slider_HorizontalSensivity");
             SliderOption_Prefab = GameObject.Instantiate(SliderOption_HorizontalSensivity);
             var SliderOption_Prefab_Text = SliderOption_Prefab.transform.Find("Text");
             GameObject.DestroyImmediate(SliderOption_Prefab_Text.GetComponent<UILocalisedText>());
@@ -186,13 +166,11 @@ namespace Nuterra.NativeOptions
             SliderOption_Prefab_TextText.resizeTextMaxSize = 15;
             SliderOption_Prefab_TextText.resizeTextMinSize = 1;
 
-            Console.WriteLine("About to instantiate Dropdown");
             DropdownOption_Prefab = GameObject.Instantiate(DropdownOption_Language);
             var DropdownOption_Prefab_Text = DropdownOption_Prefab.transform.Find("Text");
             GameObject.DestroyImmediate(DropdownOption_Prefab_Text.GetComponent<UILocalisedText>());
             DropdownOption_Prefab.GetComponentInChildren<Dropdown>().ClearOptions();
 
-            Console.WriteLine("About to instantiate Checkbox");
             CheckboxOption_Prefab = GameObject.Instantiate(CheckboxOption_PauseOnFocusLost);
             var CheckboxOption_Prefab_Text = CheckboxOption_Prefab.transform.Find("Text");
             GameObject.DestroyImmediate(CheckboxOption_Prefab_Text.GetComponent<UILocalisedText>());
