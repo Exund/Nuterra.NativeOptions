@@ -11,6 +11,7 @@ namespace Nuterra.NativeOptions
 	public class OptionToggle : Option<bool>
 	{
 		private Toggle toggle;
+
 		public OptionToggle(string Name, string ModName, bool DefaultValue = false) : base(Name, ModName, DefaultValue) {
 			UIElement = GameObject.Instantiate(UIElements.CheckboxOption_Prefab);
 			UIElement.SetActive(true);
@@ -23,11 +24,8 @@ namespace Nuterra.NativeOptions
 		}
 
 		public override bool Value {
-			get
-			{
-				return toggle.isOn;
-			}
-			set
+			get => toggle.isOn;
+            set
 			{
 				toggle.isOn = value;
 				base.Value = value;

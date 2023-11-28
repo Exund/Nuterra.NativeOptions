@@ -10,9 +10,10 @@ namespace Nuterra.NativeOptions
 {
 	public class OptionListEnum<T> : Option<T> where T : Enum, IConvertible
 	{
-		Dropdown dropdown;
+		private Dropdown dropdown;
 
 		public OptionListEnum(string Name, string ModName) : this(Name, ModName, (T)Enum.ToObject(typeof(T), 0)) { }
+
 		public OptionListEnum(string Name, string ModName, T DefaultValue) : base(Name, ModName, DefaultValue)
 		{
 			UIElement = GameObject.Instantiate(UIElements.DropdownOption_Prefab);
@@ -47,8 +48,8 @@ namespace Nuterra.NativeOptions
 	public class OptionList<T> : Option<int>
 	{
 		private List<T> items;
+		private Dropdown dropdown;
 
-		Dropdown dropdown;
 		public OptionList(string Name, string ModName, List<T> Items, int DefaultValue = 0) : base(Name, ModName, DefaultValue)
 		{
 			UIElement = GameObject.Instantiate(UIElements.DropdownOption_Prefab);
@@ -66,12 +67,9 @@ namespace Nuterra.NativeOptions
 			dropdown.onValueChanged.AddListener((v) => { this.Value = v; });
 		}
 
-		public T Selected
-		{
-			get => items[base.Value];
-		}
+		public T Selected => items[base.Value];
 
-		public override int Value
+        public override int Value
 		{
 			get => dropdown.value;
 			set

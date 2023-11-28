@@ -10,7 +10,8 @@ namespace Nuterra.NativeOptions
 {
 	public class OptionText : Option<string>
 	{
-		InputField input;
+		private InputField input;
+
 		public OptionText(string Name, string ModName, string DefaultValue = "", int MaxLength = int.MaxValue, InputField.ContentType ContentType = InputField.ContentType.Standard) : base(Name, ModName, DefaultValue)
 		{
 			UIElement = GameObject.Instantiate(UIElements.InputFieldOption_Prefab);
@@ -22,16 +23,18 @@ namespace Nuterra.NativeOptions
 			input.contentType = ContentType;
 			Value = DefaultValue;
 
-			input.onValueChanged.AddListener((v) => { if (v != base.Value) this.Value = v; });
+			input.onValueChanged.AddListener((v) => {
+                if (v != base.Value)
+                {
+                    this.Value = v;
+                }
+            });
 		}
 
 		public override string Value
 		{
-			get
-			{
-				return input.text;
-			}
-			set
+			get => input.text;
+            set
 			{
 				input.text = value;
 				base.Value = value;

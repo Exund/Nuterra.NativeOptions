@@ -22,7 +22,7 @@ namespace Nuterra.NativeOptions
 			UIElement.SetActive(true);
 			UIElement.name = $"KeybindingOption_{ModName}-{Name}";	
 
-			if (UIElements.Pre1481)
+			/*if (UIElements.Pre1481)
 			{
 				var KeybindButton = UIElement.transform.Find("Buttons Panel/Button").gameObject;
 				Button1 = KeybindButton.GetComponent<Button>();
@@ -30,12 +30,12 @@ namespace Nuterra.NativeOptions
 				UIElement.transform.Find("Text").GetComponent<Text>().text = Name;
 			} 
 			else
-            {
+            {*/
 				var KeybindButton = UIElement.transform.Find("ButtonPos2");
 				Button1 = KeybindButton.GetComponent<Button>();
 				Text1 = KeybindButton.GetComponentInChildren<Text>();
 				UIElement.transform.Find("AxisName").GetComponent<Text>().text = Name;
-			}
+			//}
 
 			Button1.onClick.AddListener(() =>
 			{
@@ -62,8 +62,8 @@ namespace Nuterra.NativeOptions
 
 		public override KeyCode Value
 		{
-			get { return m_Value; }
-			set
+            get => m_Value;
+            set
 			{
 				if (value == KeyCode.Backspace) value = KeyCode.None;
 				m_Value = value;

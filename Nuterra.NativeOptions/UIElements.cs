@@ -21,14 +21,14 @@ namespace Nuterra.NativeOptions
         public static readonly Sprite Option_Content_Highlight_BG = Sprites.First(f => f.name == "Option_Content_Highlight_BG");
         public static readonly Sprite Button_Disabled_BG = Sprites.First(f => f.name == "Button_Disabled_BG");
 
-        private static Dictionary<int, ComponentPool.Pool> PoolLookup = (Dictionary<int, ComponentPool.Pool>)typeof(ComponentPool).GetField("m_PoolLookup", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(Singleton.Manager<ComponentPool>.inst);
+        //private static Dictionary<int, ComponentPool.Pool> PoolLookup = (Dictionary<int, ComponentPool.Pool>)typeof(ComponentPool).GetField("m_PoolLookup", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(Singleton.Manager<ComponentPool>.inst);
 
-        private static FieldInfo SliderSFM = typeof(UIOptionsBehaviourSlider).GetField("m_FSM", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        //private static FieldInfo SliderSFM = typeof(UIOptionsBehaviourSlider).GetField("m_FSM", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         public static readonly GameObject[] GameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
         public static readonly GameObject DropdownOption_Language = GameObjects.First(f => f.name == "DropdownOption_Language");
         public static readonly GameObject CheckboxOption_PauseOnFocusLost = GameObjects.First(f => f.name == "CheckboxOption_PauseOnFocusLost");
         public static readonly GameObject SliderOption_HorizontalSensivity = GameObjects.First(f => f.name == "SliderOption_HorizontalSensivity");
-        public static readonly GameObject KeybindingPrefab_TurnCamera = GameObjects.First(f => f.name == "KeybindingPrefab_TurnCamera");
+        //public static readonly GameObject KeybindingPrefab_TurnCamera = GameObjects.First(f => f.name == "KeybindingPrefab_TurnCamera");
         public static readonly GameObject Controls_KeybindingOption_FireWeapons;
 
         public static readonly GameObject InputFieldOption_Prefab;
@@ -42,7 +42,7 @@ namespace Nuterra.NativeOptions
 
         internal static bool Inited = false;
 
-        public static readonly bool Pre1481 = new Version(SKU.DisplayVersion) < new Version("1.4.8.1");
+        //public static readonly bool Pre1481 = new Version(SKU.DisplayVersion) < new Version("1.4.8.1");
 
         static UIElements()
         {
@@ -66,7 +66,7 @@ namespace Nuterra.NativeOptions
 
             InputFieldOption_Prefab = UIElements.CreateOptionEntry("", "InputFieldOption_Prefab");
 
-            var InputFieldOption_PrefabRect = InputFieldOption_Prefab.GetComponent<RectTransform>();
+            //var InputFieldOption_PrefabRect = InputFieldOption_Prefab.GetComponent<RectTransform>();
             var InputFieldOption_PrefabBehaviourInputField = InputFieldOption_Prefab.AddComponent<UIOptionsBehaviourInputField>();
 
             var InputFieldOption_Prefab_InputField = DefaultControls.CreateInputField(new DefaultControls.Resources()
@@ -85,7 +85,7 @@ namespace Nuterra.NativeOptions
             InputFieldOption_Prefab_InputFieldRect.sizeDelta = new Vector2(202f, 30f);
 
             var InputFieldOption_Prefab_InputField_Placeholder = InputFieldOption_Prefab_InputField.transform.Find("Placeholder").gameObject;
-            var InputFieldOption_Prefab_InputField_PlaceholderRect = InputFieldOption_Prefab_InputField_Placeholder.GetComponent<RectTransform>();
+            //var InputFieldOption_Prefab_InputField_PlaceholderRect = InputFieldOption_Prefab_InputField_Placeholder.GetComponent<RectTransform>();
             var InputFieldOption_Prefab_InputField_PlaceholderText = InputFieldOption_Prefab_InputField_Placeholder.GetComponent<Text>();
             InputFieldOption_Prefab_InputField_PlaceholderText.text = "";
             InputFieldOption_Prefab_InputField_PlaceholderText.alignment = TextAnchor.MiddleLeft;
@@ -96,7 +96,7 @@ namespace Nuterra.NativeOptions
             InputFieldOption_Prefab_InputField_PlaceholderText.lineSpacing = 1;
 
             var InputFieldOption_Prefab_InputField_Text = InputFieldOption_Prefab_InputField.transform.Find("Text").gameObject;
-            var InputFieldOption_Prefab_InputField_TextRect = InputFieldOption_Prefab_InputField_Text.GetComponent<RectTransform>();
+            //var InputFieldOption_Prefab_InputField_TextRect = InputFieldOption_Prefab_InputField_Text.GetComponent<RectTransform>();
             var InputFieldOption_Prefab_InputField_TextText = InputFieldOption_Prefab_InputField_Text.GetComponent<Text>();
             InputFieldOption_Prefab_InputField_TextText.text = "";
             InputFieldOption_Prefab_InputField_TextText.alignment = TextAnchor.MiddleLeft;
@@ -107,7 +107,7 @@ namespace Nuterra.NativeOptions
             InputFieldOption_Prefab_InputField_TextText.lineSpacing = 1;
             InputFieldOption_Prefab_InputField.transform.SetParent(InputFieldOption_Prefab.transform, false);
 
-            if (Pre1481)
+            /*if (Pre1481)
             {
                 KeyOption_Prefab = GameObject.Instantiate(KeybindingPrefab_TurnCamera);
                 KeyOption_Prefab.SetActive(true);
@@ -116,14 +116,14 @@ namespace Nuterra.NativeOptions
                 KeybindEntryText.GetComponent<Text>().text = "";
                 var KeybindButton1 = KeyOption_Prefab.transform.Find("Buttons Panel/Button").gameObject;
                 KeybindButton1.GetComponent<Button>().interactable = true;
-                /*var KeybindButton2 = KeybindingPrefab_TurnCamera.transform.Find("Buttons Panel/Button (2)").gameObject;
-				KeybindButton2.SetActive(true);
-				KeybindButton2.GetComponent<Button>().interactable = true;*/
+                //var KeybindButton2 = KeybindingPrefab_TurnCamera.transform.Find("Buttons Panel/Button (2)").gameObject;
+				//KeybindButton2.SetActive(true);
+				//KeybindButton2.GetComponent<Button>().interactable = true;
 
                 CategoryPrefab = GameObjects.First(f => f.name.StartsWith("_EmptySpace_ (1)"));
             }
             else
-            {
+            {*/
                 Controls_KeybindingOption_FireWeapons = GameObjects.First(f => f.name == "Controls_KeybindingOption FireWeapons");
                 UIElements.KeyOption_Prefab = GameObject.Instantiate(Controls_KeybindingOption_FireWeapons.transform.Find("FirstRow (1)").gameObject);
 
@@ -154,7 +154,7 @@ namespace Nuterra.NativeOptions
                 var catRect = CategoryPrefab.GetComponent<RectTransform>();
                 catRect.sizeDelta = new Vector2(590f, 50f);
                 GameObject.DestroyImmediate(CategoryPrefab.GetComponentInChildren<UILocalisedText>());
-            }
+            //}
 
             SliderOption_Prefab = GameObject.Instantiate(SliderOption_HorizontalSensivity);
             var SliderOption_Prefab_Text = SliderOption_Prefab.transform.Find("Text");

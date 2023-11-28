@@ -24,12 +24,16 @@ namespace Nuterra.NativeOptions
 	}
 
 	public abstract class Option<T> : Option
-	{	
-		public virtual T Value { get => (T)value; set => this.value = value; }
+	{
+        public virtual T Value
+        {
+            get => (T)value; 
+            set => this.value = value;
+        }
 
-		public T SavedValue { get => (T)savedValue; }
+		public T SavedValue => (T)savedValue;
 
-		public Option(string Name, string ModName, T DefaultValue)
+        public Option(string Name, string ModName, T DefaultValue)
 		{
 			this.name = Name;
 			this.modName = ModName;

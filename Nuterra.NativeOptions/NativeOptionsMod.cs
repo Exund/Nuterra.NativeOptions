@@ -31,163 +31,6 @@ namespace Nuterra.NativeOptions
 		}
 	}
 
-	public class UIUtilities
-	{
-		public static string GetComponentTree(GameObject go, string tab = "")
-		{
-			StringBuilder tree = new StringBuilder(tab + go.name);
-			tree.AppendLine();
-			tree.AppendFormat("{0}\tActive: {1}", tab, go.activeSelf);
-			tree.AppendFormat("\n{0}\tComponents :\n", tab);
-			foreach (Component item in go.GetComponents<Component>())
-			{
-				tree.AppendFormat("{0}\t\t{1} {2}", tab, item.GetType().ToString(), item.name);
-				try
-				{
-					if (item is RectTransform rect)
-					{
-						tree.AppendFormat("\n{0}\t\t\tanchoredPosition3D {1}", tab, rect.anchoredPosition3D.ToString());
-						tree.AppendFormat("\n{0}\t\t\tanchorMin ({1}, {2})", tab, rect.anchorMin.x, rect.anchorMin.y);
-						tree.AppendFormat("\n{0}\t\t\tanchorMax ({1}, {2})", tab, rect.anchorMax.x, rect.anchorMax.y);
-						tree.AppendFormat("\n{0}\t\t\toffsetMin {1}", tab, rect.offsetMin.ToString());
-						tree.AppendFormat("\n{0}\t\t\toffsetMax {1}", tab, rect.offsetMax.ToString());
-						tree.AppendFormat("\n{0}\t\t\tpivot {1}", tab, rect.pivot.ToString());
-						tree.AppendFormat("\n{0}\t\t\tsizeDelta {1}", tab, rect.sizeDelta.ToString());
-						tree.AppendFormat("\n{0}\t\t\tlocalScale {1}", tab, rect.localScale.ToString());
-					}
-					if (item is LayoutGroup lg)
-					{
-						tree.AppendFormat("\n{0}\t\t\tchildAlignment {1}", tab, lg.childAlignment.ToString());
-						tree.AppendFormat("\n{0}\t\t\tlayoutPriority {1}", tab, lg.layoutPriority);
-						tree.AppendFormat("\n{0}\t\t\tpadding {1}", tab, lg.padding);
-					}
-					if (item is HorizontalOrVerticalLayoutGroup hvlg)
-					{	
-						tree.AppendFormat("\n{0}\t\t\tchildControlWidth {1}", tab, hvlg.childControlWidth);
-						tree.AppendFormat("\n{0}\t\t\tchildControlHeight {1}", tab, hvlg.childControlHeight);
-						tree.AppendFormat("\n{0}\t\t\tchildForceExpandWidth {1}", tab, hvlg.childForceExpandWidth);
-						tree.AppendFormat("\n{0}\t\t\tchildForceExpandHeight {1}", tab, hvlg.childForceExpandHeight);						
-						tree.AppendFormat("\n{0}\t\t\tspacing {1}", tab, hvlg.spacing);		
-					}
-					if(item is GridLayoutGroup glg)
-					{
-						tree.AppendFormat("\n{0}\t\t\tcellSize {1}", tab, glg.cellSize.ToString());
-						tree.AppendFormat("\n{0}\t\t\tconstraint {1}", tab, glg.constraint.ToString());
-						tree.AppendFormat("\n{0}\t\t\tconstraintCount {1}", tab, glg.constraintCount);
-						tree.AppendFormat("\n{0}\t\t\tspacing {1}", tab, glg.spacing.ToString());
-						tree.AppendFormat("\n{0}\t\t\tstartAxis {1}", tab, glg.startAxis.ToString());
-						tree.AppendFormat("\n{0}\t\t\tstartCorner {1}", tab, glg.startCorner.ToString());
-					}
-					if (item is ScrollRect sr)
-					{
-						tree.AppendFormat("\n{0}\t\t\tdecelerationRate {1}", tab, sr.decelerationRate);
-						tree.AppendFormat("\n{0}\t\t\telasticity {1}", tab, sr.elasticity);
-						tree.AppendFormat("\n{0}\t\t\tinertia {1}", tab, sr.inertia);
-						tree.AppendFormat("\n{0}\t\t\tscrollSensitivity {1}", tab, sr.scrollSensitivity);
-						tree.AppendFormat("\n{0}\t\t\tvelocity ({1}, {2})", tab, sr.velocity.x, sr.velocity.y);
-						tree.AppendFormat("\n{0}\t\t\tmovementType {1}", tab, sr.movementType.ToString());
-						tree.AppendFormat("\n{0}\t\t\thorizontal {1}", tab, sr.horizontal);
-						tree.AppendFormat("\n{0}\t\t\thorizontalScrollbarSpacing {1}", tab, sr.horizontalScrollbarSpacing);
-						tree.AppendFormat("\n{0}\t\t\thorizontalScrollbarVisibility {1}", tab, sr.horizontalScrollbarVisibility.ToString());
-						tree.AppendFormat("\n{0}\t\t\tvertical {1}", tab, sr.vertical);
-						tree.AppendFormat("\n{0}\t\t\tverticalScrollbarSpacing {1}", tab, sr.verticalScrollbarSpacing);
-						tree.AppendFormat("\n{0}\t\t\tverticalScrollbarVisibility {1}", tab, sr.verticalScrollbarVisibility.ToString());
-					}
-					if(item is ContentSizeFitter csf)
-					{
-						tree.AppendFormat("\n{0}\t\t\thorizontalFit {1}", tab, csf.horizontalFit.ToString());
-						tree.AppendFormat("\n{0}\t\t\tverticalFit {1}", tab, csf.verticalFit.ToString());
-					}
-					if (item is Text t)
-					{
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "text", t.text);
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "alignment", t.alignment.ToString());
-						if(t.font) tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "font", t.font.name);
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "fontSize", t.fontSize);
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "fontStyle", t.fontStyle.ToString());
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "color", t.color.ToString());
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "lineSpacing", t.lineSpacing);
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "resizeTextForBestFit", t.resizeTextForBestFit);
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "resizeTextMaxSize", t.resizeTextMaxSize);
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "resizeTextMinSize", t.resizeTextMinSize);
-					}
-					if (item is Shadow s)
-					{
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "effectColor", s.effectColor.ToString());
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "effectDistance", s.effectDistance.ToString());
-					}
-					if (item is Image i)
-					{
-						if (i.sprite) tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "sprite", i.sprite.name);
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "color", i.color);
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "type", i.type.ToString());
-					}
-					if (item is Selectable se)
-					{
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "interactable", se.interactable);
-						if (se.image)
-						{
-							tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "image", se.image.name);
-							if (se.image.sprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "sprite", se.image.sprite.name);
-							tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "color", se.image.color);
-							tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "type", se.image.type.ToString());
-						}
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "transition", se.transition.ToString());
-						switch (se.transition)
-						{
-							case Selectable.Transition.ColorTint:
-								var colors = se.colors;
-								tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "normalColor", colors.normalColor.ToString());
-								tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "highlightedColor", colors.highlightedColor.ToString());
-								tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "pressedColor", colors.pressedColor.ToString());
-								tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "disabledColor", colors.disabledColor.ToString());
-								tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "colorMultiplier", colors.colorMultiplier.ToString());
-								tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "fadeDuration", colors.fadeDuration.ToString());
-								break;
-							case Selectable.Transition.SpriteSwap:
-								var state = se.spriteState;
-								if (state.highlightedSprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "highlightedSprite", state.highlightedSprite.name);
-								if (state.pressedSprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "pressedSprite", state.pressedSprite.name);
-								if (state.disabledSprite) tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "disabledSprite", state.disabledSprite.name);
-								break;
-							default: break;
-						}
-						tree.AppendFormat("\n{0}\t\t\t{1} {2}", tab, "navigation", se.navigation.ToString());
-						tree.AppendFormat("\n{0}\t\t\t\t{1} {2}", tab, "mode", se.navigation.mode.ToString());
-						if(se.navigation.mode == Navigation.Mode.Explicit)
-						{
-							if(se.navigation.selectOnUp) tree.AppendFormat("\n{0}\t\t\t\t\t{1} {2}", tab, "selectOnUp", se.navigation.selectOnUp.name);
-							if(se.navigation.selectOnDown) tree.AppendFormat("\n{0}\t\t\t\t\t{1} {2}", tab, "selectOnDown", se.navigation.selectOnDown.name);
-							if(se.navigation.selectOnLeft) tree.AppendFormat("\n{0}\t\t\t\t\t{1} {2}", tab, "selectOnLeft", se.navigation.selectOnLeft.name);
-							if(se.navigation.selectOnRight) tree.AppendFormat("\n{0}\t\t\t\t\t{1} {2}", tab, "selectOnRight", se.navigation.selectOnRight.name);
-						}
-
-					}
-					if (item is ILayoutElement le)
-					{
-						tree.AppendFormat("\n{0}\t\t\tminWidth {1}", tab, le.minWidth);
-						tree.AppendFormat("\n{0}\t\t\tminHeight {1}", tab, le.minHeight);
-						tree.AppendFormat("\n{0}\t\t\tpreferredWidth {1}", tab, le.preferredWidth);
-						tree.AppendFormat("\n{0}\t\t\tpreferredHeight {1}", tab, le.preferredHeight);
-						tree.AppendFormat("\n{0}\t\t\tflexibleWidth {1}", tab, le.flexibleWidth);
-						tree.AppendFormat("\n{0}\t\t\tflexibleHeight {1}", tab, le.flexibleHeight);
-					}
-					tree.AppendLine();
-				} catch { }
-			}
-			tree.AppendLine();
-			tree.AppendFormat("{0}\tChildrens :\n", tab);
-			for (int i = 0; i < go.transform.childCount; i++)
-			{
-				if (!go.transform.GetChild(i).gameObject.name.Contains("ObjectHighlight"))
-				{
-					tree.Append(GetComponentTree(go.transform.GetChild(i).gameObject, tab + "\t"));
-				}
-			}
-			return tree.ToString();
-		}
-	}
-
 	static class Patches
 	{
 		private static readonly FieldInfo m_OptionsTypeCount;
@@ -293,7 +136,8 @@ namespace Nuterra.NativeOptions
 				panel_rect.anchorMax = reference_rect.anchorMax;
 				panel_rect.pivot = reference_rect.pivot;
 				panel_rect.sizeDelta = reference_rect.sizeDelta;
-				optionsElements[optionsCount - 1] = Mods.AddComponent<UIOptionsMods>();
+				var uiOptionsMods = Mods.AddComponent<UIOptionsMods>();
+                optionsElements[optionsCount - 1] = uiOptionsMods;
 				Mods.transform.SetParent(optionsElements[0].gameObject.transform.parent, false);
 
 				// Allow tab to be activatable
@@ -305,7 +149,7 @@ namespace Nuterra.NativeOptions
 						instance.ShowOptions((UIScreenOptions.OptionsType)(optionsCount - 1));
 					}
 				});
-				((UIOptionsMods)optionsElements[optionsCount - 1]).tab_toggle = modsToggle;
+                uiOptionsMods.tab_toggle = modsToggle;
 
 				// Create UI elements
 				GameObject bottom_panel = DefaultControls.CreatePanel(resources);
@@ -389,9 +233,9 @@ namespace Nuterra.NativeOptions
 				next_iconRect.localEulerAngles = new Vector3(0, 180f, 0);
 				next_page.transform.SetParent(buttons_panel.transform, false);
 
-				UIOptionsMods.PageInfo = page_info;
-				UIOptionsMods.PrevPage = prev_page;
-				UIOptionsMods.NextPage = next_page;
+				UIOptionsMods.PageInfo = page_info.transform;
+				UIOptionsMods.PrevPage = prev_page.transform;
+				UIOptionsMods.NextPage = next_page.transform;
 
 				GameObject top_panel = DefaultControls.CreatePanel(resources);
 				top_panel.name = "Top Panel";
@@ -421,7 +265,7 @@ namespace Nuterra.NativeOptions
 				GameObject category1_title = DefaultControls.CreateText(resources);
 				category1_title.name = "Title";
 				var title1 = category1_title.GetComponent<Text>();
-				title1.text = "LEFT SIDE";
+                title1.text = "";//"LEFT SIDE";
 				title1.alignment = TextAnchor.MiddleCenter;
 				title1.font = UIElements.ExoSemiBold;
 				title1.fontSize = 16;
@@ -443,7 +287,7 @@ namespace Nuterra.NativeOptions
 				GameObject category2_title = DefaultControls.CreateText(resources);
 				category2_title.name = "Title";
 				var title2 = category2_title.GetComponent<Text>();
-				title2.text = "RIGHT SIDE";
+                title2.text = "";//"RIGHT SIDE";
 				title2.alignment = TextAnchor.MiddleCenter;
 				title2.font = UIElements.ExoSemiBold;
 				title2.fontSize = 16;
@@ -513,9 +357,9 @@ namespace Nuterra.NativeOptions
 				content2Group.padding = new RectOffset(0, 0, 5, 0);
 				content2.transform.SetParent(mid_panel.transform, false);
 				
-				UIOptionsMods.MidPanel = mid_panel;
-				UIOptionsMods.Content1 = content1;
-				UIOptionsMods.Content2 = content2;
+				UIOptionsMods.MidPanel = mid_panel.transform;
+				UIOptionsMods.Content1 = content1.transform;
+				UIOptionsMods.Content2 = content2.transform;
 
 				midGroup.CalculateLayoutInputHorizontal();
 				midGroup.CalculateLayoutInputVertical();

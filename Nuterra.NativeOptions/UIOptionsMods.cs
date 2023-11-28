@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
@@ -9,19 +10,19 @@ using Rewired;
 
 namespace Nuterra.NativeOptions
 {
-	class UIOptionsMods : UIOptions
+    internal class UIOptionsMods : UIOptions
 	{
 		private static List<Option> m_Options = new List<Option>();
 		private static List<Option> m_PendingOptions = new List<Option>();
 		private static OptionKey m_PendingRequest;
 
-		internal static GameObject Content1;
-		internal static GameObject Content2;
-		internal static GameObject MidPanel;
+		internal static Transform Content1;
+		internal static Transform Content2;
+		internal static Transform MidPanel;
 
-		internal static GameObject PrevPage;
-		internal static GameObject NextPage;
-		internal static GameObject PageInfo;
+		internal static Transform PrevPage;
+		internal static Transform NextPage;
+		internal static Transform PageInfo;
 
 		private int page_index = 0;
 		private List<Page> pages = new List<Page>();
@@ -42,7 +43,7 @@ namespace Nuterra.NativeOptions
 			return result;
 		}
 
-		void Update()
+        private void Update()
 		{
 			if(m_PendingRequest != null)
 			{
@@ -73,8 +74,8 @@ namespace Nuterra.NativeOptions
 		}
 
 		public override void OnCloseScreen() {
-			if (m_PendingRequest != null) m_PendingRequest.Reset();
-			m_PendingRequest = null;
+            m_PendingRequest?.Reset();
+            m_PendingRequest = null;
 		}
 
 		public override void ResetSettings() { }
@@ -91,188 +92,227 @@ namespace Nuterra.NativeOptions
 			NativeOptionsMod.onOptionsSaved.Invoke();
 		}
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Entry OptToEntry(Option o) => new Entry("", o);
+
 		public override void Setup(EventNoParams OnChangeEvent)
 		{
 			this.ChangesMadeEventToCall = OnChangeEvent;
 
-			if(m_PendingOptions.Count > 0)
+            if (m_PendingOptions.Count == 0)
+            {
+                return;
+            }
+
+            HandlePandingOptions();
+
+			try
+            {
+                GeneratePages();
+            }
+			catch (Exception e)
 			{
-				foreach (var option in m_PendingOptions)
-				{ 
-					if (option.onValueChanged is Dropdown.DropdownEvent dde)
-					{
-						dde.AddListener((e) => { ChangesMadeEventToCall.Send(); });
-					}
-					if (option.onValueChanged is InputField.OnChangeEvent oce)
-					{
-						oce.AddListener((e) => { ChangesMadeEventToCall.Send(); });
-					}
-					if (option.onValueChanged is Slider.SliderEvent sle)
-					{
-						sle.AddListener((e) => { ChangesMadeEventToCall.Send(); });
-					}
-					if (option.onValueChanged is Toggle.ToggleEvent tge)
-					{
-						tge.AddListener((e) => { ChangesMadeEventToCall.Send(); });
-					}
-					if (option.onValueChanged is OptionKey.OnChangeEvent koce)
-					{
-						koce.AddListener((e) => { ChangesMadeEventToCall.Send(); });
-					}
-				}
-
-				m_Options.AddRange(m_PendingOptions);
-				m_PendingOptions.Clear();
-
-				m_Options = m_Options.OrderBy(o => o.modName).ToList();
-
-				try
-				{
-					var columns = new List<Column>();
-					var ci = 0;
-					foreach (var group in m_Options.GroupBy(o => o.modName))
-					{
-						if (columns.Count == ci) columns.Add(new Column() { entries = new List<Entry>()});
-						var opts = group.ToList();
-						var num = opts.Count + 1;
-						if (num < 11)
-						{
-							var cc = columns[ci];
-							if (cc.entries.Count + num < 11)
-							{
-								cc.entries.Add(new Entry(group.Key));
-								cc.entries.AddRange(opts.Select(o => new Entry("", o)));
-							}
-							else
-							{
-								ci++;
-								var ccc = new Column()
-								{
-									entries = new List<Entry>()
-									{
-										new Entry(group.Key)
-									}
-								};
-								ccc.entries.AddRange(opts.Select(o => new Entry("", o)));
-								columns.Add(ccc);
-							}
-						}
-						else if (num < 17)
-						{
-							ci++;
-							var ccc = new Column()
-							{
-								entries = new List<Entry>()
-								{
-									new Entry(group.Key)
-								}
-							};
-							ccc.entries.AddRange(opts.Select(o => new Entry("", o)));
-							if (columns[0].entries.Count != 0) columns.Add(ccc);
-							else columns[0] = ccc;
-						}
-						else
-						{
-							var ii = opts.GetRange(0, opts.Count);
-							while (ii.Count > 0)
-							{
-								ci++;
-								var ccc = new Column()
-								{
-									entries = new List<Entry>()
-									{
-										new Entry(group.Key)
-									}
-								};
-								ccc.entries.AddRange(ii.GetRange(0, Math.Min(16, ii.Count)).Select(o => new Entry("", o)));
-								if (columns[0].entries.Count != 0) columns.Add(ccc);
-								else columns[0] = ccc;
-
-								ii.RemoveRange(0, Math.Min(16, ii.Count));
-							}
-						}
-						Console.WriteLine(columns.Select(c => c.entries.Count).ToArray());
-					}
-
-					pages = new List<Page>();
-					var pi = -1;
-					for (var i = 0; i < columns.Count; i++)
-					{
-						if (i % 2 == 0) pi++;
-						if (pages.Count == pi) pages.Add(new Page() { columns = new List<Column>() });
-						pages[pi].columns.Add(columns[i]);
-					}
-				}
-				catch (Exception e)
-				{
-					Console.WriteLine("Pagination");
-					Console.WriteLine(e.ToString());
-				}
-
-				var prev = PrevPage.GetComponent<Button>();
-				prev.onClick.RemoveAllListeners();
-				prev.onClick.AddListener(() =>
-				{
-					SetPage(page_index - 1);
-				});
-
-				var next = NextPage.GetComponent<Button>();
-				next.onClick.RemoveAllListeners();
-				next.onClick.AddListener(() =>
-				{
-					SetPage(page_index + 1);
-				});
-
-				SetPage(0);
+				Console.WriteLine("Pagination");
+				Console.WriteLine(e.ToString());
 			}
+
+			var prev = PrevPage.GetComponent<Button>();
+			prev.onClick.RemoveAllListeners();
+			prev.onClick.AddListener(() =>
+			{
+				SetPage(page_index - 1);
+			});
+
+			var next = NextPage.GetComponent<Button>();
+			next.onClick.RemoveAllListeners();
+			next.onClick.AddListener(() =>
+			{
+				SetPage(page_index + 1);
+			});
+
+			SetPage(0);
 		}
 
-		void SetPage(int index)
-		{
-			if (index < 0 || index >= pages.Count) return;
+        private void HandlePandingOptions()
+        {
+            foreach (var option in m_PendingOptions)
+            { 
+                switch (option.onValueChanged)
+                {
+                    case Dropdown.DropdownEvent dde:
+                        dde.AddListener(e => { ChangesMadeEventToCall.Send(); });
+                        break;
+                    case InputField.OnChangeEvent oce:
+                        oce.AddListener(e => { ChangesMadeEventToCall.Send(); });
+                        break;
+                    case Slider.SliderEvent sle:
+                        sle.AddListener(e => { ChangesMadeEventToCall.Send(); });
+                        break;
+                    case Toggle.ToggleEvent tge:
+                        tge.AddListener(e => { ChangesMadeEventToCall.Send(); });
+                        break;
+                    case OptionKey.OnChangeEvent koce:
+                        koce.AddListener(e => { ChangesMadeEventToCall.Send(); });
+                        break;
+                }
+            }
 
-			while(Content1.transform.childCount > 0)
+            m_Options.AddRange(m_PendingOptions);
+            m_PendingOptions.Clear();
+
+            m_Options = m_Options.OrderBy(o => o.modName).ToList();
+        }
+
+        private void GeneratePages()
+        {
+			var columns = new List<Column>();
+			var columnIndex = 0;
+			foreach (var group in m_Options.GroupBy(o => o.modName))
 			{
-				Content1.transform.GetChild(0).SetParent(null, false);
+				if (columns.Count == columnIndex) {
+                    columns.Add(new Column() { entries = new List<Entry>() });
+                }
+
+                var title = new Entry(group.Key);
+				var options = group.ToList();
+				var optsCount = options.Count + 1;
+				if (optsCount < 11)
+				{
+					var currentColumn = columns[columnIndex];
+					if (currentColumn.entries.Count + optsCount < 11)
+					{
+						currentColumn.entries.Add(title);
+						currentColumn.entries.AddRange(options.Select(OptToEntry));
+					}
+					else
+					{
+						columnIndex++;
+						var column = new Column()
+						{
+							entries = new List<Entry>() { title }
+						};
+						column.entries.AddRange(options.Select(OptToEntry));
+						columns.Add(column);
+					}
+				}
+				else if (optsCount < 17)
+				{
+					columnIndex++;
+					var column = new Column()
+					{
+						entries = new List<Entry>() { title }
+					};
+					column.entries.AddRange(options.Select(OptToEntry));
+
+					if (columns[0].entries.Count != 0) {
+                        columns.Add(column);
+                    }
+                    else
+                    {
+                        columns[0] = column;
+                    }
+				}
+				else
+				{
+					var slice = options.GetRange(0, options.Count);
+					while (slice.Count > 0)
+					{
+						columnIndex++;
+						var column = new Column()
+						{
+							entries = new List<Entry>() { title }
+						};
+
+                        var count = Math.Min(16, slice.Count);
+						column.entries.AddRange(slice.GetRange(0, count).Select(OptToEntry));
+
+                        if (columns[0].entries.Count != 0)
+                        {
+                            columns.Add(column);
+                        }
+                        else
+                        {
+                            columns[0] = column;
+                        }
+
+						slice.RemoveRange(0, count);
+					}
+				}
+				//Console.WriteLine(columns.Select(c => c.entries.Count).ToArray());
 			}
-			while (Content2.transform.childCount > 0)
+
+			/*pages = new List<Page>();
+			var pageIndex = -1;
+			for (var i = 0; i < columns.Count; i++)
 			{
-				Content2.transform.GetChild(0).SetParent(null, false);
+                if (i % 2 == 0)
+                {
+                    pageIndex++;
+                }
+
+                if (pages.Count == pageIndex)
+                {
+                    pages.Add(new Page() { columns = new List<Column>() });
+                }
+
+				pages[pageIndex].columns.Add(columns[i]);
+			}*/
+
+            pages = columns.Select((v, i) => new { v, i })
+                .GroupBy(v => v.i / 2, v => v.v)
+                .Select(c => new Page() { columns = c.ToList() })
+                .ToList();
+        }
+
+        private void SetPage(int index)
+		{
+            if (index < 0 || index >= pages.Count)
+            {
+                return;
+            }
+
+			while(Content1.childCount > 0)
+			{
+				Content1.GetChild(0).SetParent(null, false);
+			}
+			while (Content2.childCount > 0)
+			{
+				Content2.GetChild(0).SetParent(null, false);
 			}
 
 			page_index = index;
 			
 			try
 			{
-				MidPanel.transform.parent.Find("Top Panel/Category 1/Title").GetComponent<Text>().text = pages[page_index].columns[0].entries[0].title.ToUpper();
+				MidPanel.parent.Find("Top Panel/Category 1/Title").GetComponent<Text>().text = pages[page_index].columns[0].entries[0].title.ToUpper();
 				foreach (var entry in pages[page_index].columns[0].entries)
 				{
 					if (entry.title != "" && entry.title != pages[page_index].columns[0].entries[0].title)
 					{
-						UIElements.CreateCategoryEntry(entry.title.ToUpper()).transform.SetParent(Content1.transform, false);
+						UIElements.CreateCategoryEntry(entry.title.ToUpper()).transform.SetParent(Content1, false);
 					}
-					else if(entry.option != null)
-					{
-						entry.option.UIElement.transform.SetParent(Content1.transform, false);
-					}
-				}
+					else
+                    {
+                        entry.option?.UIElement.transform.SetParent(Content1, false);
+                    }
+                }
 
 				if (pages[page_index].columns.Count > 1)
 				{
-					MidPanel.transform.parent.Find("Top Panel/Category 2/Title").GetComponent<Text>().text = pages[page_index].columns[1].entries[0].title.ToUpper();
+					MidPanel.parent.Find("Top Panel/Category 2/Title").GetComponent<Text>().text = pages[page_index].columns[1].entries[0].title.ToUpper();
 					foreach (var entry in pages[page_index].columns[1].entries)
 					{
 						if (entry.title != "" && entry.title != pages[page_index].columns[1].entries[0].title)
 						{
-							UIElements.CreateCategoryEntry(entry.title.ToUpper()).transform.SetParent(Content2.transform, false);
+							UIElements.CreateCategoryEntry(entry.title.ToUpper()).transform.SetParent(Content2, false);
 						}
-						else if (entry.option != null)
-						{
-							entry.option.UIElement.transform.SetParent(Content2.transform, false);
-						}
-					}
+						else
+                        {
+                            entry.option?.UIElement.transform.SetParent(Content2, false);
+                        }
+                    }
 				}
-				else MidPanel.transform.parent.Find("Top Panel/Category 2/Title").GetComponent<Text>().text = "";
+				else MidPanel.parent.Find("Top Panel/Category 2/Title").GetComponent<Text>().text = "";
 			}
 			catch (Exception e)
 			{
@@ -308,7 +348,7 @@ namespace Nuterra.NativeOptions
 			text.text = $"Page {page_index + 1}/{pages.Count}";
 		}
 
-		struct Entry
+        private struct Entry
 		{
 			public string title;
 			public Option option;
@@ -320,12 +360,12 @@ namespace Nuterra.NativeOptions
 			}
 		}
 
-		struct Column
+        private struct Column
 		{
 			public List<Entry> entries;
 		}
 
-		struct Page
+        private struct Page
 		{
 			public List<Column> columns;
 		}
